@@ -2,7 +2,6 @@ import * as routes from './routes';
 import * as cards from './cards'; //TODO watch the folder to update in real time?
 import { InitializeExpress } from './initializers/express';
 import { InitializeWebSocket, UserData } from './initializers/webSocket';
-import { setApplication } from './shared';
 import { onUserSetCard } from './game';
 
 type RoomType = { [key in string]: UserData[] }
@@ -14,11 +13,6 @@ export const getRooms = () => rooms;
 (async () => {
   const express = InitializeExpress();
   const websocket = InitializeWebSocket(express);
-
-  setApplication({
-    express,
-    websocket,
-  })
 
   Object.values(routes).forEach((registerRoute) => {
     registerRoute(express);

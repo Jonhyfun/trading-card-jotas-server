@@ -10,7 +10,7 @@ export function InitializeExpress() {
   app.use(cors({ origin: true, credentials: true }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }));
-  app.get('/.well-known/acme-challenge/x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ', (req, res) => {
+  app.get('/.well-known/acme-challenge/x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ', (req, res) => { //TODO esconder isso kkkkk
     res.send('x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ.JdBjlVg4ZbelazlWDsncgBeQtHeDOGkT6JO6-bwjWYs').end()
   })
 

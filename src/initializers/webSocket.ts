@@ -5,8 +5,8 @@ import { WebSocketServer } from "ws";
 
 import type { Express } from 'express';
 import type { WebSocket } from 'ws';
-import { setSockets } from '../shared';
 import { Cards } from '../cards/types';
+import { setSockets } from '../shared/socket';
 
 export interface UserData {
   hand: any[]
@@ -34,7 +34,7 @@ export function InitializeWebSocket(app: Express) {
 
   wss.on('connection', (ws: ConnectedSocket, req) => {
     ws.req = req;
-    setSockets((ws.req.headers['x-forwarded-for'] || ws.req.socket.remoteAddress), '', ws, undefined, true);
+    setSockets((ws.req.headers['x-forwarded-for'] || ws.req.socket.remoteAddress), ws);
 
     ws.on('message', (data) => {
       const [key, ...value] = data.toString().split('/')
