@@ -1,6 +1,6 @@
 import { evaluate } from 'mathjs'
 import { UserData } from "../initializers/webSocket";
-import { Cards } from '../cards/types';
+import { DeckCard } from '../cards/types';
 import * as CardsObject from '../cards'
 import { getRooms } from '..';
 
@@ -8,7 +8,7 @@ const equationSanitizer = (equation) => {
   return equation.replace(/([*\/])\s(([*\/])\s){1,}(?!\d)/g, "")
 };
 
-export const onUserSetCard = (player: UserData, card: Cards) => {
+export const onUserSetCard = (player: UserData, card: DeckCard) => {
   if (!player.currentSetCard) {
     player.currentSetCard = card
 
@@ -16,8 +16,11 @@ export const onUserSetCard = (player: UserData, card: Cards) => {
     const otherPlayer = roomPlayers.find(({ stance }) => stance !== player.stance)!
 
     if (roomPlayers.every((player) => player.currentSetCard)) {
-      player.cardStack.push(player.currentSetCard)
-      otherPlayer.cardStack.push(otherPlayer.currentSetCard!)
+      const focusedStack = player.stance === 'attack' ? otherPlayer.cardStack : player.cardStack
+      const otherStack = player.stance === 'defense' ? otherPlayer.cardStack : player.cardStack
+
+      focusedStack.push(player.currentSetCard)
+      otherStack.push(otherPlayer.currentSetCard!)
 
       player.currentSetCard = undefined
       otherPlayer.currentSetCard = undefined
@@ -35,8 +38,8 @@ const onReveal = (attackingPlayer: UserData, defendingPlayer: UserData) => {
   const secondPendingEffect = defendingPlayer.pendingEffects.shift()
   if (secondPendingEffect) secondPendingEffect();
 
-  CardsObject[attackingPlayer.cardStack.slice(-1)[0]].default.effect(attackingPlayer, defendingPlayer)
-  CardsObject[defendingPlayer.cardStack.slice(-1)[0]].default.effect(defendingPlayer, attackingPlayer)
+  CardsObject[attackingPlayer.cardStack.slice(-1)[0].card].default.effect(attackingPlayer, defendingPlayer)
+  CardsObject[defendingPlayer.cardStack.slice(-1)[0].card].default.effect(defendingPlayer, attackingPlayer)
 
   attackingPlayer.points.push(handlePointsSum(attackingPlayer))
   defendingPlayer.points.push(handlePointsSum(defendingPlayer))
@@ -49,8 +52,8 @@ const handlePointsSum = (user: UserData) => {
   const { cardStack: userStack } = user
   let megaOperation = ''
 
-  userStack.forEach((cardId) => {
-    const { default: card } = CardsObject[cardId]
+  userStack.forEach((deckCard) => {
+    const { default: card } = CardsObject[deckCard.card]
 
     //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
     const operator = "+"

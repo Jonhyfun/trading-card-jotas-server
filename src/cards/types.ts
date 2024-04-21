@@ -2,6 +2,10 @@ import { UserData } from "../initializers/webSocket"
 import * as cards from './index'
 
 export type Cards = keyof typeof cards
+export type DeckCard = {
+  card: Cards
+  id: string
+}
 
 export type CardData = {
   label: string,

@@ -1,10 +1,9 @@
 import * as routes from './routes';
 import * as cards from './cards'; //TODO watch the folder to update in real time?
 import { InitializeExpress } from './initializers/express';
-import { InitializeWebSocket, UserData } from './initializers/webSocket';
-import { onUserSetCard } from './game';
+import { ConnectedSocket, InitializeWebSocket } from './initializers/webSocket';
 
-type RoomType = { [key in string]: UserData[] }
+type RoomType = { [key in string]: ConnectedSocket[] }
 let rooms: RoomType = {};
 
 export const setRooms = (setter: ((current: RoomType) => RoomType)) => { rooms = setter(rooms) }
@@ -21,35 +20,6 @@ export const getRooms = () => rooms;
   process.on('unhandledRejection', (reason, promise) => {
     console.error('Unhandled Rejection at:', promise, 'reason:', reason);
   });
-
-  const testPlayerA: UserData = {
-    room: 'A',
-    stance: 'attack',
-    points: [], pendingEffects: [], globalEffects: [], hand: [], hiddenCards: [],
-    cardStack: []//['two', 'x', 'plus', 'three']
-  } //42?     2 + 2 + 2 + (2 * 3 * 3 * 2) after sanitation
-  const testPlayerB: UserData = {
-    room: 'A',
-    stance: 'defense',
-    points: [], pendingEffects: [], globalEffects: [], hand: [], hiddenCards: [],
-    cardStack: []//['two', 'plus', 'two']
-  } //42?     2 + 2 + 2 + (2 * 3 * 3 * 2) after sanitation
-
-  setRooms((current) => ({ ...current, A: [testPlayerA, testPlayerB] }))
-
-  onUserSetCard(testPlayerA, 'three');
-  onUserSetCard(testPlayerB, 'two');
-
-  onUserSetCard(testPlayerA, 'two');
-  onUserSetCard(testPlayerB, 'x');
-
-  onUserSetCard(testPlayerA, 'exclamation');
-  onUserSetCard(testPlayerB, 'three');
-
-  onUserSetCard(testPlayerA, 'two');
-  onUserSetCard(testPlayerB, 'exclamation');
-
-  console.log(testPlayerA, testPlayerB)
 
   console.log();
   console.log('-----------------')

@@ -5,15 +5,16 @@ import { WebSocketServer } from "ws";
 
 import type { Express } from 'express';
 import type { WebSocket } from 'ws';
-import { Cards } from '../cards/types';
-import { setSockets } from '../shared/socket';
+import { Cards, DeckCard } from '../cards/types';
 
 export interface UserData {
-  hand: any[]
+  hand: DeckCard[]
+  pile: DeckCard[]
+  deck: DeckCard[]
   points: (number | null)[]
-  cardStack: Cards[]
-  hiddenCards: Cards[]
-  currentSetCard?: Cards
+  cardStack: DeckCard[]
+  hiddenCards: DeckCard['id'][]
+  currentSetCard?: DeckCard
   globalEffects: ('invertedOdds')[]
   pendingEffects: (() => void)[]
   room: string
@@ -21,7 +22,7 @@ export interface UserData {
 }
 
 export type ConnectedSocket = WebSocket & UserData & {
-  req: any
+  ip: string
 }
 
 export function InitializeWebSocket(app: Express) {
@@ -30,23 +31,22 @@ export function InitializeWebSocket(app: Express) {
     cert: readFileSync("fullchain.pem")
   }, app);
 
-  const wss = new WebSocketServer({ server, maxPayload: 2000000 });
+  const wss = new WebSocketServer({ server, maxPayload: 2 * 1024 }); //2kb
 
-  wss.on('connection', (ws: ConnectedSocket, req) => {
-    ws.req = req;
-    setSockets((ws.req.headers['x-forwarded-for'] || ws.req.socket.remoteAddress), ws);
+  wss.on('connection', (ws: WebSocket & ConnectedSocket, req) => {
+    ws.ip = req.socket.remoteAddress!.toString();
 
     ws.on('message', (data) => {
       const [key, ...value] = data.toString().split('/')
       const message = Events[key];
 
-      if (/*Object.keys(FreeEvents).includes(key) ||*/ (ws.room && message)) {
+      if (message) {
         message(ws, value);
       }
-      else if (data.toString() !== 'V1.2') {
-        ws.send('mismatch');
-        ws.close();
-      }
+      //else if (data.toString() !== 'V1.2') {
+      //  ws.send('mismatch');
+      //  ws.close();
+      //}
 
     });
 
