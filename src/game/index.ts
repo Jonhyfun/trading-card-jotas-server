@@ -52,13 +52,18 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
 
   [attackingPlayer, defendingPlayer].forEach((player) => {
     const nextCard = player.ingameDeck.splice(0, 1)?.[0]
-    if (!(attackingPlayer.globalEffects.includes('repeatTurns') || defendingPlayer.globalEffects.includes('repeatTurns'))) {
+
+    const attackingGlobalEffect = attackingPlayer.globalEffects.shift();
+    const defendingGlobalEffect = defendingPlayer.globalEffects.shift();
+
+    if (!(attackingGlobalEffect === 'repeatTurns' || defendingGlobalEffect === 'repeatTurns')) {
       player.stance = player.stance === 'attack' ? 'defense' : 'attack'
     }
 
     if (nextCard) {
       player.hand.push(nextCard)
     }
+
 
     player.send(`setStance/${player.stance}`)
     player.send(`loadHand/${JSON.stringify(player.hand)}`)

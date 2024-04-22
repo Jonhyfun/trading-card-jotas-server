@@ -14,12 +14,12 @@ export function InitializeExpress() {
     res.send('x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ.JdBjlVg4ZbelazlWDsncgBeQtHeDOGkT6JO6-bwjWYs').end()
   })
 
-  http.createServer({
+  https.createServer({
     key: readFileSync("privkey.pem"),
     cert: readFileSync("fullchain.pem")
-  }, app).listen(80);
+  }, app).listen(86);
 
-  console.log('\x1b[90m%s\x1b[0m', 'server running on http://localhost:80')
+  console.log('\x1b[90m%s\x1b[0m', 'server running on http://localhost:86')
 
   return app;
 }

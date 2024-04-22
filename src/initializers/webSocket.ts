@@ -6,7 +6,6 @@ import { WebSocketServer } from "ws";
 import type { Express } from 'express';
 import type { WebSocket } from 'ws';
 import { DeckCard } from '../cards/types';
-import { getRandomArbitrary } from '../utils/random';
 
 export interface UserData {
   hand: DeckCard[]
@@ -53,9 +52,9 @@ export function InitializeWebSocket(app: Express) {
 
   });
 
-  server.listen(443);
+  server.listen(446);
 
-  console.log('\x1b[36m%s\x1b[0m', 'websocket running on wss://localhost:443')
+  console.log('\x1b[36m%s\x1b[0m', 'websocket running on wss://localhost:446')
 
   return wss;
 }
