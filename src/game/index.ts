@@ -53,12 +53,7 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   [attackingPlayer, defendingPlayer].forEach((player) => {
     const nextCard = player.ingameDeck.splice(0, 1)?.[0]
 
-    const attackingGlobalEffect = attackingPlayer.globalEffects.shift();
-    const defendingGlobalEffect = defendingPlayer.globalEffects.shift();
-
-    if (!(attackingGlobalEffect === 'repeatTurns' || defendingGlobalEffect === 'repeatTurns')) {
-      player.stance = player.stance === 'attack' ? 'defense' : 'attack'
-    }
+    player.stance = player.stance === 'attack' ? 'defense' : 'attack'
 
     if (nextCard) {
       player.hand.push(nextCard)
@@ -94,13 +89,15 @@ const handlePointsSum = (user: UserData) => {
   userStack.forEach((deckCard) => {
     const { default: card } = CardsObject[deckCard.card]
     if (card.ghost && card.value) user.points = [...user.points.slice(0, -1), (user.points.slice(-1)?.[0] ?? 0) + card.value]
-    if (card.ghost) return megaOperation
+    if (card.ghost) return
 
     //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
-    const operator = "+"
+    const operator = card.value ? (card.value < 0 ? '-' : "+") : '+'
 
-    megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? (operator + card.value) : '')}`
+    megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? `${operator}${Math.abs(card.value)}` : '')}`
   })
+
+  console.log(`current ${(user as ConnectedSocket).ip} operation: ${megaOperation}`)
 
   try {
     return evaluate(equationSanitizer(megaOperation)) ?? 0

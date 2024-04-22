@@ -7,7 +7,10 @@ const cardData: CardData = {
   limit: 1,
   ghost: true,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    castingPlayer.globalEffects.push('repeatTurns')
+    castingPlayer.pendingEffects.push(() => {
+      castingPlayer.stance = castingPlayer.stance === 'attack' ? 'defense' : 'attack'
+      otherPlayer.stance = otherPlayer.stance === 'attack' ? 'defense' : 'attack'
+    })
   }
 }
 

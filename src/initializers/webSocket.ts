@@ -15,7 +15,7 @@ export interface UserData {
   cardStack: DeckCard[]
   hiddenCards: DeckCard['id'][]
   currentSetCard?: DeckCard
-  globalEffects: ('invertedOdds' | 'repeatTurns')[]
+  globalEffects: ('invertedOdds')[]
   pendingEffects: (() => void)[]
   room: string
   stance: 'attack' | 'defense'

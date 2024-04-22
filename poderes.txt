@@ -30,3 +30,6 @@ joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
 --forna = Inverte o sinal do total atual
 eu = carta que embaralha a pilha aleatoriamente? kkkkk
 
+
+alguma coisa bugou a hashtag talvez com a interrogação e eu fiquei eternamente na outra pilha?
+o hashtag ta trocando os turnos muito rápido kkkk
