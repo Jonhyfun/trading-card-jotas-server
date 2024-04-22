@@ -5,19 +5,15 @@ const cardData: CardData = {
   label: '!',
   value: null,
   limit: 2,
+  operation: '.',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    const castingPlayerPreviousCardStack = [...castingPlayer.cardStack]
+    const lastCastingPlayerCard = castingPlayer.cardStack.splice(-1, 1)
+    const lastOtherPlayerCard = otherPlayer.cardStack.splice(-1, 1)
 
-    castingPlayer.cardStack = [
-      ...castingPlayer.cardStack.slice(0, -2),
-      otherPlayer.cardStack.slice(-2, -1)[0],
-      castingPlayer.cardStack.slice(-1)[0],
-    ]
-    otherPlayer.cardStack = [
-      ...otherPlayer.cardStack.slice(0, -2),
-      castingPlayerPreviousCardStack.slice(-2, -1)[0],
-      otherPlayer.cardStack.slice(-1)[0],
-    ]
+    if (lastCastingPlayerCard.length === 1 && lastOtherPlayerCard.length === 1) {
+      castingPlayer.cardStack.push(lastOtherPlayerCard[0])
+      otherPlayer.cardStack.push(lastCastingPlayerCard[0])
+    }
   }
 }
 

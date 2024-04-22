@@ -9,9 +9,10 @@
 
 
 	! = Troca a carta anterior com a carta da pilha inimiga [2]
-	- = Inverte o sinal dos números ímpares [2]
-	? = A próxima carta pode ser colocada virada para baixo, para ser revelada apenas 	ao final do jogo (fantasma) 	[2]
-	+ = Copia a próxima carta [2]
+- = Inverte o sinal dos números ímpares [2]
+? = A próxima carta pode ser colocada virada para baixo, para ser revelada apenas 	ao final do jogo (fantasma) 	[2]
+	? = Essa carta toma a forma de uma carta aleatória pertencente a pilha colocada [2]
++ = Copia a próxima carta [2]
 	x = Multiplica o número/produto anterior com a próxima carta [2]
 	/ = Divide o número/produto anterior com a próxima carta [2]
 
@@ -27,4 +28,5 @@ fantasma - A carta é pulada em efeitos que consideram "a próxima carta" (caso 
 Comentarios = 
 joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
 --forna = Inverte o sinal do total atual
+eu = carta que embaralha a pilha aleatoriamente? kkkkk
 

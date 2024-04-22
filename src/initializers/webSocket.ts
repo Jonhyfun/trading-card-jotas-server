@@ -5,17 +5,18 @@ import { WebSocketServer } from "ws";
 
 import type { Express } from 'express';
 import type { WebSocket } from 'ws';
-import { Cards, DeckCard } from '../cards/types';
+import { DeckCard } from '../cards/types';
+import { getRandomArbitrary } from '../utils/random';
 
 export interface UserData {
   hand: DeckCard[]
-  pile: DeckCard[]
+  ingameDeck: DeckCard[]
   deck: DeckCard[]
   points: (number | null)[]
   cardStack: DeckCard[]
   hiddenCards: DeckCard['id'][]
   currentSetCard?: DeckCard
-  globalEffects: ('invertedOdds')[]
+  globalEffects: ('invertedOdds' | 'repeatTurns')[]
   pendingEffects: (() => void)[]
   room: string
   stance: 'attack' | 'defense'
@@ -34,7 +35,7 @@ export function InitializeWebSocket(app: Express) {
   const wss = new WebSocketServer({ server, maxPayload: 2 * 1024 }); //2kb
 
   wss.on('connection', (ws: WebSocket & ConnectedSocket, req) => {
-    ws.ip = req.socket.remoteAddress!.toString();
+    ws.ip = req.socket.remoteAddress!.toString()// + getRandomArbitrary(0, 100);
 
     ws.on('message', (data) => {
       const [key, ...value] = data.toString().split('/')

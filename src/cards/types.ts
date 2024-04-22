@@ -10,6 +10,7 @@ export type DeckCard = {
 export type CardData = {
   label: string,
   value: number | null,
+  ghost?: boolean,
   operation?: string,
   limit: 1 | 2 | 3,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => void

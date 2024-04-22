@@ -5,10 +5,14 @@ const cardData: CardData = {
   label: '?',
   value: null,
   limit: 2,
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => ({
-    castingPlayer: { ...castingPlayer, cardStack: castingPlayer.cardStack },
-    otherPlayer: { ...otherPlayer, cardStack: otherPlayer.cardStack }
-  })
+  effect: (castingPlayer: UserData, otherPlayer: UserData) => {
+    const interrogation = castingPlayer.cardStack.splice(-1)
+    if (castingPlayer.cardStack.length <= 1) {
+      castingPlayer.cardStack = [...interrogation]
+      return
+    }
+    castingPlayer.cardStack.push(castingPlayer.cardStack[Math.floor(Math.random() * castingPlayer.cardStack.length)])
+  }
 }
 
 export default cardData

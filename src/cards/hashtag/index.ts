@@ -5,7 +5,10 @@ const cardData: CardData = {
   label: '#',
   value: -3,
   limit: 1,
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => { }
+  ghost: true,
+  effect: (castingPlayer: UserData, otherPlayer: UserData) => {
+    castingPlayer.globalEffects.push('repeatTurns')
+  }
 }
 
 export default cardData

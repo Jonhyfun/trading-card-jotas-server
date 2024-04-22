@@ -6,11 +6,7 @@ const cardData: CardData = {
   value: null,
   limit: 2,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    if (castingPlayer.globalEffects.includes('invertedOdds')) {
-      castingPlayer.globalEffects = castingPlayer.globalEffects.filter((effect) => effect !== 'invertedOdds')
-    } else {
-      castingPlayer.globalEffects.push('invertedOdds')
-    }
+    castingPlayer.globalEffects.push('invertedOdds')
   }
 }
 

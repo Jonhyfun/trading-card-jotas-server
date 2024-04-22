@@ -1,18 +1,20 @@
 import { setRooms } from "..";
 import { Cards, DeckCard } from "../cards/types";
 import { onUserSetCard } from "../game";
-import { ConnectedSocket, UserData } from "../initializers/webSocket";
+import { ConnectedSocket } from "../initializers/webSocket";
 import { makeId, shuffle } from "../utils/random";
 
 const baseSetCurrentDeck = (ws: ConnectedSocket, payload: string) => {
   if (!ws.hand || ws.hand?.length === 0) {
     const selectedCards = JSON.parse(payload) as Cards[]
-    selectedCards.forEach((card, i) => {
-      if (!ws.deck) ws.deck = []
-      ws.deck.push(({ card, id: `${i}-${makeId(8)}` }))
-    })
-    console.log(`${ws.ip} salvou o deck`)
-    return true
+    if (selectedCards && selectedCards.length) {
+      ws.deck = []
+      selectedCards.forEach((card, i) => {
+        ws.deck.push(({ card, id: `${i}-${makeId(8)}` }))
+      })
+      console.log(`${ws.ip} salvou o deck`)
+      return true
+    }
   }
   return false
 }
@@ -34,7 +36,7 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   }
 
   const initialUserData = {
-    room: payload,
+    room: joinData.room,
     stance: 'attack',
     points: [],
     pendingEffects: [],
@@ -50,53 +52,51 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   })
 
   setRooms((current) => {
-    const alreadyConnectedUserIndex = current[payload] ? current[payload].findIndex(({ ip }) => ip === ws.ip) : -1
+    const alreadyConnectedUserIndex = current[joinData.room] ? current[joinData.room].findIndex(({ ip }) => ip === ws.ip) : -1
 
     if (alreadyConnectedUserIndex !== -1 && alreadyConnectedUserIndex !== undefined) {
-      const removedUser = current[payload].splice(alreadyConnectedUserIndex, 1)[0]
+      const removedUser = current[joinData.room].splice(alreadyConnectedUserIndex, 1)[0]
 
       Object.keys(initialUserData).forEach((key) => {
         ws[key] = removedUser[key]
       })
 
       ws.send(`setStance/${ws.stance}`);
-      console.log(`${ws.ip} reconectou em ${payload} como ${ws.stance}`)
+      console.log(`${ws.ip} reconectou em ${joinData.room} como ${ws.stance}`)
       ws.send('joinedRoom')
 
-      return { ...current, [payload]: [...current[payload], ws] }
+      return { ...current, [joinData.room]: [...current[joinData.room], ws] }
     }
 
 
     if (!ws.deck || ws.deck.length !== 20) {
+      console.log(ws.deck.length)
       ws.send('error/Deck inválido!')
       ws.send('redirect/-')
       return current
     }
 
-    if (current[payload]?.[0]) {
-      ws.stance = 'defense'
+    if (current[joinData.room]?.[0]) {
       ws.send(`setStance/${ws.stance}`);
-      console.log(`${ws.ip} entrou em ${payload} como ${ws.stance}`)
+      console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
       ws.send('joinedRoom')
-      return { ...current, [payload]: [current[payload][0], ws] }
+      return { ...current, [joinData.room]: [current[joinData.room][0], ws] }
     }
 
     ws.send(`setStance/${ws.stance}`);
-    console.log(`${ws.ip} entrou em ${payload} como ${ws.stance}`)
+    console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
     ws.send('joinedRoom')
-    return { ...current, [payload]: [ws] }
+    return { ...current, [joinData.room]: [ws] }
   })
 }
 
-export const setCard = (ws: ConnectedSocket, payload: DeckCard['id']) => {
-  const pickedCardIndex = ws.hand.findIndex(({ id }) => payload === id)
-  console.log(`rodei`)
+export const setCard = (ws: ConnectedSocket, payload: [DeckCard['id']]) => {
+  const pickedCardIndex = ws.hand.findIndex(({ id }) => payload[0] === id)
   if (pickedCardIndex > -1) {
-    console.log(ws.hand)
     const pickedCard = ws.hand.splice(pickedCardIndex, 1)[0]
     if (pickedCard) {
-      console.log(ws.hand)
       onUserSetCard(ws, pickedCard)
+      ws.send(`loadHand/${JSON.stringify(ws.hand)}`)
     }
   }
 }
@@ -104,9 +104,9 @@ export const setCard = (ws: ConnectedSocket, payload: DeckCard['id']) => {
 export const fetchHand = (ws: ConnectedSocket) => {
   if (ws.hand && ws.deck?.length && ws.hand.length === 0) {
     console.log('fetchou')
-    shuffle(ws.deck)
-    ws.hand = ws.deck.slice(0, 5)
-    ws.pile = ws.deck.slice(5)
+    ws.ingameDeck = ws.deck
+    shuffle(ws.ingameDeck)
+    ws.hand = ws.ingameDeck.splice(0, 5)
   }
   ws.send(`loadHand/${JSON.stringify(ws.hand)}`)
 }

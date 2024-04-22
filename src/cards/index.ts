@@ -1,6 +1,6 @@
 export * as exclamation from './exclamation'
 export * as interrogation from './interrogation'
-export * as minus from './minus'
+//export * as minus from './minus'
 export * as slash from './slash'
 export * as x from './x'
 export * as hashtag from './hashtag'
