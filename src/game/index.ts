@@ -50,10 +50,15 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   attackingPlayer.points.push(handlePointsSum(attackingPlayer));
   defendingPlayer.points.push(handlePointsSum(defendingPlayer));
 
+  const currentAttackingGlobal = attackingPlayer.globalEffects.shift();
+  const currentDefendingGlobal = defendingPlayer.globalEffects.shift();
+
   [attackingPlayer, defendingPlayer].forEach((player) => {
     const nextCard = player.ingameDeck.splice(0, 1)?.[0]
 
-    player.stance = player.stance === 'attack' ? 'defense' : 'attack'
+    if (!(currentAttackingGlobal === 'sendRepeatedTurn' || currentDefendingGlobal === 'sendRepeatedTurn')) {
+      player.stance = player.stance === 'attack' ? 'defense' : 'attack'
+    }
 
     if (nextCard) {
       player.hand.push(nextCard)
