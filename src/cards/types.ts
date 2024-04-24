@@ -13,6 +13,7 @@ export type CardData = {
   ghost?: boolean,
   operation?: string,
   desc?: string,
+  priority?: 1 | 2,
   limit: 1 | 2 | 3,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => void
 }

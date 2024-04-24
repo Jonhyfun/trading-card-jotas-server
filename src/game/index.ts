@@ -41,11 +41,17 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   if (secondPendingEffect) secondPendingEffect();
 
   //? Clonando as cartas pra não travar efeitos que modificarem a stack no primeiro effect
-  const attackingCard = attackingPlayer.cardStack.slice(-1)[0].card
-  const defenseCard = defendingPlayer.cardStack.slice(-1)[0].card
+  const attackingCard = CardsObject[attackingPlayer.cardStack.slice(-1)[0].card].default
+  const defenseCard = CardsObject[defendingPlayer.cardStack.slice(-1)[0].card].default
 
-  CardsObject[attackingCard].default.effect(attackingPlayer, defendingPlayer);
-  CardsObject[defenseCard].default.effect(defendingPlayer, attackingPlayer);
+  if ((attackingCard.priority ?? 0) > (defenseCard.priority ?? 0)) {
+    attackingCard.effect(attackingPlayer, defendingPlayer);
+    defenseCard.effect(defendingPlayer, attackingPlayer);
+  }
+  else {
+    defenseCard.effect(defendingPlayer, attackingPlayer);
+    attackingCard.effect(attackingPlayer, defendingPlayer);
+  }
 
   attackingPlayer.points.push(handlePointsSum(attackingPlayer));
   defendingPlayer.points.push(handlePointsSum(defendingPlayer));
@@ -79,8 +85,8 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   defendingPlayer.send(`loadOtherPoints/${attackingPlayer.points.slice(-1)[0]!.toFixed(2)}`)
 
   if (attackingPlayer.hand.length === 0 || defendingPlayer.hand.length === 0) {
-    const attackWins = attackingPlayer.points.slice(-1) > defendingPlayer.points.slice(-1)
-    const defenseWins = defendingPlayer.points.slice(-1) > attackingPlayer.points.slice(-1)
+    const attackWins = (attackingPlayer.points.slice(-1)?.[0] ?? 0) > (defendingPlayer.points.slice(-1)?.[0] ?? 0);
+    const defenseWins = (defendingPlayer.points.slice(-1)?.[0] ?? 0) > (attackingPlayer.points.slice(-1)?.[0] ?? 0);
 
     attackingPlayer.send(`${attackWins ? 'success' : 'error'}/${attackWins ? 'Você venceu!' : 'Você perdeu...'}`)
     defendingPlayer.send(`${defenseWins ? 'success' : 'error'}/${defenseWins ? 'Você venceu!' : 'Você perdeu...'}`)
@@ -94,7 +100,7 @@ const handlePointsSum = (user: UserData) => {
   userStack.forEach((deckCard) => {
     const { default: card } = CardsObject[deckCard.card]
     if (card.ghost && card.value) {
-      const [currentPoints] = user.points.splice(-1, 1)
+      const [currentPoints] = user.points.splice(-1, 1) //TODO só somar no final?
       user.points.push((currentPoints || 0) + card.value)
     }
     if (card.ghost) return

@@ -5,6 +5,7 @@ const cardData: CardData = {
   label: '?',
   value: null,
   limit: 2,
+  priority: 1,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
     const interrogation = castingPlayer.cardStack.splice(-1)
     if (castingPlayer.cardStack.length <= 1) {
