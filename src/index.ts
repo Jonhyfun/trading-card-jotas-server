@@ -2,6 +2,9 @@ import * as routes from './routes';
 import * as cards from './cards'; //TODO watch the folder to update in real time?
 import { InitializeExpress } from './initializers/express';
 import { ConnectedSocket, InitializeWebSocket } from './initializers/webSocket';
+import { evaluate } from 'mathjs';
+import { Cards } from './cards/types';
+import { handlePointsSumTest } from './game';
 
 type RoomType = { [key in string]: ConnectedSocket[] }
 let rooms: RoomType = {};
@@ -35,4 +38,25 @@ export const getRooms = () => rooms;
     }
   })
   console.log('-----------------')
+
+  //const tmpUser = {
+  //  points: [], cardStack: []
+  //};
+  //
+  //([
+  //  'minusfour',
+  //  'minusthree',
+  //  'ten',
+  //  'caret',
+  //  'minusfour',
+  //  'one',
+  //  'five',
+  //  'hashtag',
+  //  'ten'
+  //] as Cards[]).forEach((card) => {
+  //  tmpUser.cardStack.push(card)
+  //  tmpUser.points.push(handlePointsSumTest(tmpUser))
+  //  console.log(tmpUser.points)
+  //})
+  //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
 })();

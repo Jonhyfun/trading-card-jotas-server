@@ -1,6 +1,6 @@
 import { evaluate } from 'mathjs'
 import { ConnectedSocket, UserData } from "../initializers/webSocket";
-import { DeckCard } from '../cards/types';
+import { Cards, DeckCard } from '../cards/types';
 import * as CardsObject from '../cards'
 import { getRooms } from '..';
 
@@ -93,7 +93,10 @@ const handlePointsSum = (user: UserData) => {
 
   userStack.forEach((deckCard) => {
     const { default: card } = CardsObject[deckCard.card]
-    if (card.ghost && card.value) user.points = [...user.points.slice(0, -1), (user.points.slice(-1)?.[0] ?? 0) + card.value]
+    if (card.ghost && card.value) {
+      const [currentPoints] = user.points.splice(-1, 1)
+      user.points.push((currentPoints || 0) + card.value)
+    }
     if (card.ghost) return
 
     //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
@@ -112,4 +115,36 @@ const handlePointsSum = (user: UserData) => {
   console.log(`current ${(user as ConnectedSocket).ip} operation: ${equationSanitizer(removeTrailingOperations(megaOperation))}`)
 
   return evaluate(equationSanitizer(removeTrailingOperations(megaOperation))) ?? 0
+
+}
+
+export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[] }) => {
+  const { cardStack: userStack } = user
+  let megaOperation = ''
+
+  userStack.forEach((deckCard) => {
+    const { default: card } = CardsObject[deckCard]
+    if (card.ghost && card.value) {
+      const [currentPoints] = user.points.splice(-1, 1)
+      user.points.push((currentPoints || 0) + card.value)
+    }
+    if (card.ghost) return
+
+    //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
+    const operator = card.value ? (card.value < 0 ? '-' : "+") : '+'
+
+    megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? `${operator}${Math.abs(card.value)}` : '')}`
+  })
+
+  const removeTrailingOperations = (operation: string) => {
+    if (!operation.slice(-1).match(/\d/g)) {
+      return removeTrailingOperations(operation.slice(0, -1))
+    }
+    return operation
+  }
+
+  console.log(`current operation: ${equationSanitizer(removeTrailingOperations(megaOperation))}`)
+
+  return evaluate(equationSanitizer(removeTrailingOperations(megaOperation))) ?? 0
+
 }
