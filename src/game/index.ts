@@ -106,6 +106,7 @@ const handlePointsSum = (user: UserData) => {
   })
 
   const removeTrailingOperations = (operation: string) => {
+    if (!operation || operation.length === 1) return operation
     if (!operation.slice(-1).match(/\d/g)) {
       return removeTrailingOperations(operation.slice(0, -1))
     }
