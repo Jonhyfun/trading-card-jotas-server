@@ -39,24 +39,16 @@ export const getRooms = () => rooms;
   })
   console.log('-----------------')
 
-  //const tmpUser = {
-  //  points: [], cardStack: []
-  //};
-  //
-  //([
-  //  'minusfour',
-  //  'minusthree',
-  //  'ten',
-  //  'caret',
-  //  'minusfour',
-  //  'one',
-  //  'five',
-  //  'hashtag',
-  //  'ten'
-  //] as Cards[]).forEach((card) => {
-  //  tmpUser.cardStack.push(card)
-  //  tmpUser.points.push(handlePointsSumTest(tmpUser))
-  //  console.log(tmpUser.points)
-  //})
-  //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
+  const tmpUser = {
+    points: [], cardStack: []
+  };
+
+  ([
+    'interrogation'
+  ] as Cards[]).forEach((card) => {
+    tmpUser.cardStack.push(card)
+    tmpUser.points.push(handlePointsSumTest(tmpUser))
+    console.log(tmpUser.points)
+  })
+  console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
 })();

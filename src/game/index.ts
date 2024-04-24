@@ -137,6 +137,7 @@ export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[]
   })
 
   const removeTrailingOperations = (operation: string) => {
+    if (!operation || operation.length === 1) return operation
     if (!operation.slice(-1).match(/\d/g)) {
       return removeTrailingOperations(operation.slice(0, -1))
     }
