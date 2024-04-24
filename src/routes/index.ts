@@ -1,4 +1,4 @@
-import { Cards, CardData } from "../cards/types";
+import { Cards } from "../cards/types";
 import { Route } from "./types";
 import * as cards from '../cards';
 
@@ -17,12 +17,11 @@ export const cardImage: Route = (app) => {
 export const getCards: Route = (app) => {
   app.get('/cards', (req, res) => {
     const result = Object.entries(cards).map(([cardKey, { default: cardData }]) => {
+      const { effect, ...cardProps } = cardData
       return ({
         key: cardKey,
-        label: cardData.label,
-        value: cardData.value,
-        limit: cardData.limit,
-        src: `/cardImage/${cardKey}.png`
+        src: `/cardImage/${cardKey}.png`,
+        ...cardProps
       })
     });
     return res.send(result)

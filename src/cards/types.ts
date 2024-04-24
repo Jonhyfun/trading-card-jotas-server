@@ -12,6 +12,7 @@ export type CardData = {
   value: number | null,
   ghost?: boolean,
   operation?: string,
+  desc?: string,
   limit: 1 | 2 | 3,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => void
 }

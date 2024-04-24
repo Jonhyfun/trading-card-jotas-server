@@ -70,7 +70,6 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
 
 
     if (!ws.deck || ws.deck.length !== 20) {
-      console.log(ws.deck.length)
       ws.send('error/Deck inválido!')
       ws.send('redirect/-')
       return current

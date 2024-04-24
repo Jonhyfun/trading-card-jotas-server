@@ -5,7 +5,7 @@ import * as CardsObject from '../cards'
 import { getRooms } from '..';
 
 const equationSanitizer = (equation) => {
-  return equation.replace(/([*\/\.])\s(([*\/\.])\s){1,}(?!\d)/g, "")
+  return equation.replace(/\./g, "").replace(/([*\/])\s(([*\/])\s){1,}(?!\d)/g, "")
 };
 
 export const onUserSetCard = (player: ConnectedSocket, card: DeckCard) => {
@@ -102,12 +102,14 @@ const handlePointsSum = (user: UserData) => {
     megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? `${operator}${Math.abs(card.value)}` : '')}`
   })
 
-  console.log(`current ${(user as ConnectedSocket).ip} operation: ${megaOperation}`)
+  const removeTrailingOperations = (operation: string) => {
+    if (!operation.slice(-1).match(/\d/g)) {
+      return removeTrailingOperations(operation.slice(0, -1))
+    }
+    return operation
+  }
 
-  try {
-    return evaluate(equationSanitizer(megaOperation)) ?? 0
-  }
-  catch {
-    return evaluate(equationSanitizer(megaOperation).replace(/[*\/\.]/g, '')) ?? 0
-  }
+  console.log(`current ${(user as ConnectedSocket).ip} operation: ${equationSanitizer(removeTrailingOperations(megaOperation))}`)
+
+  return evaluate(equationSanitizer(removeTrailingOperations(megaOperation))) ?? 0
 }
