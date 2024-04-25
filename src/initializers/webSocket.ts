@@ -1,11 +1,13 @@
-import https from 'https';
 import * as Events from '../wsEvents'
+import http from 'http';
+import https from 'https';
 import { readFileSync } from "fs";
 import { WebSocketServer } from "ws";
 
 import type { Express } from 'express';
 import type { WebSocket } from 'ws';
 import { DeckCard } from '../cards/types';
+import { isDev } from '../utils/meta';
 
 export interface UserData {
   hand: DeckCard[]
@@ -26,7 +28,7 @@ export type ConnectedSocket = WebSocket & UserData & {
 }
 
 export function InitializeWebSocket(app: Express) {
-  const server = https.createServer({
+  const server = (isDev() ? http : https).createServer({
     key: readFileSync("privkey.pem"),
     cert: readFileSync("fullchain.pem")
   }, app);
@@ -54,7 +56,7 @@ export function InitializeWebSocket(app: Express) {
 
   server.listen(446);
 
-  console.log('\x1b[36m%s\x1b[0m', 'websocket running on wss://localhost:446')
+  console.log('\x1b[36m%s\x1b[0m', `websocket running on ws${isDev() ? '' : 's'}://localhost:446`)
 
   return wss;
 }

@@ -6,6 +6,7 @@ const cardData: CardData = {
   value: 0,
   ghost: true,
   limit: 1,
+  desc: 'Mova a carta anterior para trás.',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
     if (castingPlayer.cardStack.length === 1) return
 

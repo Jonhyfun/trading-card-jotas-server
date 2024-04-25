@@ -6,6 +6,7 @@ const cardData: CardData = {
   value: null,
   limit: 2,
   operation: '.',
+  desc: 'Troca essa carta com a carta jogada na outra pilha.',
   priority: 2,
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
     const lastCastingPlayerCard = castingPlayer.cardStack.splice(-1, 1)

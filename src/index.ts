@@ -5,6 +5,7 @@ import { ConnectedSocket, InitializeWebSocket } from './initializers/webSocket';
 import { evaluate } from 'mathjs';
 import { Cards } from './cards/types';
 import { handlePointsSumTest } from './game';
+import { isDev } from './utils/meta';
 
 type RoomType = { [key in string]: ConnectedSocket[] }
 let rooms: RoomType = {};
@@ -51,4 +52,8 @@ export const getRooms = () => rooms;
     console.log(tmpUser.points)
   })
   console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
+
+  if (isDev()) {
+    console.log('to no dev')
+  }
 })();
