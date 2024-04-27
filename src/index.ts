@@ -45,13 +45,20 @@ export const getRooms = () => rooms;
   };
 
   ([
-    'interrogation'
+    'ten',
+    'x',
+    'exclamation',
+    'five',
+    'exclamation',
+    'exclamation',
+    'x',
+    'minusfour'
   ] as Cards[]).forEach((card) => {
     tmpUser.cardStack.push(card)
     tmpUser.points.push(handlePointsSumTest(tmpUser))
     console.log(tmpUser.points)
   })
-  console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
+  //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
 
   if (isDev()) {
     console.log('to no dev')

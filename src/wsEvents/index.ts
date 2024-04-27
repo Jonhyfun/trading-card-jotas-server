@@ -38,6 +38,7 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   const initialUserData = {
     room: joinData.room,
     stance: 'attack',
+    operation: '',
     points: [],
     pendingEffects: [],
     globalEffects: [],

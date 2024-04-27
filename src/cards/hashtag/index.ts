@@ -3,10 +3,9 @@ import { CardData } from "../types"
 
 const cardData: CardData = {
   label: '#',
-  value: -3,
-  limit: 1,
-  ghost: true,
-  desc: 'No próximo turno você e seu oponente continuam na mesma pilha (quem jogou essa carta perde 3 pontos).',
+  value: -2,
+  limit: 3,
+  desc: 'No próximo turno você e seu oponente continuam na mesma pilha (essa carta vale -2 pontos).',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
     castingPlayer.globalEffects.push('sendRepeatedTurn')
     otherPlayer.globalEffects.push('sendRepeatedTurn')

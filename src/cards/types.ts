@@ -15,5 +15,6 @@ export type CardData = {
   desc?: string,
   priority?: 1 | 2,
   limit: 1 | 2 | 3,
+  modifyPreviousCard?: (card: CardData) => CardData
   effect: (castingPlayer: UserData, otherPlayer: UserData) => void
 }

@@ -1,8 +1,19 @@
-import { evaluate } from 'mathjs'
-import { ConnectedSocket, UserData } from "../initializers/webSocket";
-import { Cards, DeckCard } from '../cards/types';
+import * as math from 'mathjs'
 import * as CardsObject from '../cards'
+import { ConnectedSocket, UserData } from "../initializers/webSocket";
+import { CardData, Cards, DeckCard } from '../cards/types';
 import { getRooms } from '..';
+
+const removeTrailingOperations = (operation: string) => {
+  if (!operation || operation.length === 1) return operation
+  if (!operation[0].match(/[\d-]/g)) {
+    return removeTrailingOperations(operation.slice(1))
+  }
+  if (!operation.slice(-1).match(/[\d-]/g)) {
+    return removeTrailingOperations(operation.slice(0, -1))
+  }
+  return operation
+}
 
 const equationSanitizer = (equation) => {
   return equation.replace(/\./g, "").replace(/([*\/])\s(([*\/])\s){1,}(?!\d)/g, "")
@@ -95,64 +106,56 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
 
 const handlePointsSum = (user: UserData) => {
   const { cardStack: userStack } = user
-  let megaOperation = ''
+  let megaOperation = ['']
 
-  userStack.forEach((deckCard) => {
-    const { default: card } = CardsObject[deckCard.card]
-    if (card.ghost && card.value) {
-      const [currentPoints] = user.points.splice(-1, 1) //TODO só somar no final?
-      user.points.push((currentPoints || 0) + card.value)
+  for (let i = 0; i < userStack.length; i += 2) {
+    const deckCard = CardsObject[userStack[i].card].default;
+    let megaOperationSnippet = (deckCard.operation ?? `${deckCard.value ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+
+    if (i + 1 < userStack.length) {
+      const nextDeckCard = CardsObject[userStack[i + 1].card].default;
+      megaOperationSnippet += nextDeckCard.operation ?? (`${nextDeckCard.value ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
     }
-    if (card.ghost) return
 
-    //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
-    const operator = card.value ? (card.value < 0 ? '-' : "+") : '+'
-
-    megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? `${operator}${Math.abs(card.value)}` : '')}`
-  })
-
-  const removeTrailingOperations = (operation: string) => {
-    if (!operation || operation.length === 1) return operation
-    if (!operation.slice(-1).match(/\d/g)) {
-      return removeTrailingOperations(operation.slice(0, -1))
+    if (deckCard.operation === '.') {
+      megaOperation.push(megaOperationSnippet)
     }
-    return operation
+
+    megaOperation[megaOperation.length - 1] += ` ${megaOperationSnippet}`;
   }
 
-  console.log(`current ${(user as ConnectedSocket).ip} operation: ${equationSanitizer(removeTrailingOperations(megaOperation))}`)
+  console.log(`current ${(user as ConnectedSocket).ip} operation: ${equationSanitizer(removeTrailingOperations(megaOperation.join('+')))}`)
 
-  return evaluate(equationSanitizer(removeTrailingOperations(megaOperation))) ?? 0
+  return math.evaluate(equationSanitizer(removeTrailingOperations(megaOperation.join('+')))) ?? 0
 
 }
 
 export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[] }) => {
   const { cardStack: userStack } = user
-  let megaOperation = ''
+  let operation = ''
 
-  userStack.forEach((deckCard) => {
-    const { default: card } = CardsObject[deckCard]
-    if (card.ghost && card.value) {
-      const [currentPoints] = user.points.splice(-1, 1)
-      user.points.push((currentPoints || 0) + card.value)
+  for (let i = 0; i < userStack.length; i += 2) {
+    const deckCard = CardsObject[userStack[i]].default;
+    let operationSnippet = (deckCard.operation ?? `${deckCard.value ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+
+    let nextDeckCard: CardData = null as any;
+    if (i + 1 < userStack.length) {
+      nextDeckCard = CardsObject[userStack[i + 1]].default;
+      operationSnippet += nextDeckCard.operation ?? (`${nextDeckCard.value ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
     }
-    if (card.ghost) return
 
-    //const operator = (card.value ?? 2) % 2 === 0 ? '+' : "-"
-    const operator = card.value ? (card.value < 0 ? '-' : "+") : '+'
-
-    megaOperation = `${megaOperation} ${card.operation ?? ((card.value || card.value === 0) ? `${operator}${Math.abs(card.value)}` : '')}`
-  })
-
-  const removeTrailingOperations = (operation: string) => {
-    if (!operation || operation.length === 1) return operation
-    if (!operation.slice(-1).match(/\d/g)) {
-      return removeTrailingOperations(operation.slice(0, -1))
-    }
-    return operation
+    operation += ` ${operationSnippet}`;
   }
 
-  console.log(`current operation: ${equationSanitizer(removeTrailingOperations(megaOperation))}`)
+  let megaOperation = '';
+  operation.split('.').forEach((_operation) => {
+    const sanitizedOperation = (equationSanitizer(removeTrailingOperations(_operation))).toString({ parenthesis: 'all' })
+    if (sanitizedOperation.match(/\d/g)) {
+      megaOperation += ` +(${sanitizedOperation})`
+    }
+  })
 
-  return evaluate(equationSanitizer(removeTrailingOperations(megaOperation))) ?? 0
+  console.log(`current operation: ${megaOperation}`)
+  return math.evaluate(megaOperation)
 
 }
