@@ -123,61 +123,58 @@ const handlePointsSum = (user: UserData) => {
   const { cardStack: userStack } = user
   let operation = ''
 
-  for (let i = 0; i < userStack.length; i += 2) {
-    let deckCard = CardsObject[userStack[i].card].default;
-    const nextDeckCard = CardsObject?.[userStack[i + 1]?.card]?.default ?? null;
-
-    if (nextDeckCard?.modifyPreviousCard) {
-      deckCard = nextDeckCard.modifyPreviousCard(deckCard)
+  const stackAsCards = [] as CardData[]
+  for (let i = 0; i < userStack.length; i++) {
+    stackAsCards[i] = CardsObject[userStack[i].card].default;
+    if (stackAsCards[i].modifyPreviousCard && i !== 0) {
+      stackAsCards[i - 1] = stackAsCards[i].modifyPreviousCard!(stackAsCards[i - 1])
     }
-
-    let operationSnippet = (deckCard.operation ?? `${deckCard.value ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
-
-    if (nextDeckCard) {
-      operationSnippet += nextDeckCard.operation ?? (`${nextDeckCard.value ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
-    }
-
-    operation += ` ${operationSnippet}`;
   }
+
+  stackAsCards.forEach((deckCard) => {
+    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+    operation += ` ${operationSnippet}`;
+  })
 
   let megaOperation = '';
   operation.split('.').forEach((_operation) => {
-    const sanitizedOperation = (equationSanitizer(removeTrailingOperations(_operation))).toString({ parenthesis: 'all' })
+    const sanitizedOperation = (math.parse(equationSanitizer(removeTrailingOperations(_operation)))).toString({ parenthesis: 'all' })
     if (sanitizedOperation.match(/\d/g)) {
       megaOperation += ` +(${sanitizedOperation})`
     }
   })
 
   console.log(`current operation: ${megaOperation}`)
-  return math.evaluate(megaOperation) === Infinity ? 0 : math.evaluate(megaOperation)
+  return math.evaluate(megaOperation) ?? 0
+
 }
 
 export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[] }) => {
   const { cardStack: userStack } = user
   let operation = ''
 
-  for (let i = 0; i < userStack.length; i += 2) {
-    const deckCard = CardsObject[userStack[i]].default;
-    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
-
-    let nextDeckCard: CardData = null as any;
-    if (i + 1 < userStack.length) {
-      nextDeckCard = CardsObject[userStack[i + 1]].default;
-      operationSnippet += nextDeckCard.operation ?? (`${(nextDeckCard.value === 0 || nextDeckCard.value) ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
+  const stackAsCards = [] as CardData[]
+  for (let i = 0; i < userStack.length; i++) {
+    stackAsCards[i] = CardsObject[userStack[i]].default;
+    if (stackAsCards[i].modifyPreviousCard && i !== 0) {
+      stackAsCards[i - 1] = stackAsCards[i].modifyPreviousCard!(stackAsCards[i - 1])
     }
-
-    operation += ` ${operationSnippet}`;
   }
+
+  stackAsCards.forEach((deckCard) => {
+    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+    operation += ` ${operationSnippet}`;
+  })
 
   let megaOperation = '';
   operation.split('.').forEach((_operation) => {
-    const sanitizedOperation = (equationSanitizer(removeTrailingOperations(_operation))).toString({ parenthesis: 'all' })
+    const sanitizedOperation = (math.parse(equationSanitizer(removeTrailingOperations(_operation)))).toString({ parenthesis: 'all' })
     if (sanitizedOperation.match(/\d/g)) {
       megaOperation += ` +(${sanitizedOperation})`
     }
   })
 
-  console.log(`current operation: ${math.parse(megaOperation).toString({ parenthesis: 'all' })}`)
-  return math.evaluate(megaOperation) === Infinity ? 0 : math.evaluate(megaOperation)
+  console.log(`current operation: ${megaOperation}`)
+  return math.evaluate(megaOperation) ?? 0
 
 }

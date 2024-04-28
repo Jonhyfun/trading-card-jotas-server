@@ -44,23 +44,24 @@ export const getRooms = () => rooms;
     points: [], cardStack: []
   };
 
-  ([
-    'ten',
-    'slash',
-    'zero',
-    'slash',
-    'zero',
-    'two',
-    'x',
-    'five'
-  ] as Cards[]).forEach((card) => {
-    tmpUser.cardStack.push(card)
-    tmpUser.points.push(handlePointsSumTest(tmpUser))
-    console.log(tmpUser.points)
-  })
-  //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
-
   if (isDev()) {
+    ([
+      'ten',
+      'slash',
+      'zero',
+      'slash',
+      'zero',
+      'two',
+      'x',
+      'five',
+      'tilde'
+    ] as Cards[]).forEach((card) => {
+      tmpUser.cardStack.push(card)
+      tmpUser.points.push(handlePointsSumTest(tmpUser))
+      console.log(tmpUser.points)
+    })
+    //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
+
     console.log('to no dev')
   }
 })();
