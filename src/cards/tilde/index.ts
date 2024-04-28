@@ -1,7 +1,7 @@
 import { UserData } from "../../initializers/webSocket"
 import { CardData } from "../types"
-import { nthIndex } from "../../utils/string"
 
+//TODO nao ta funcionando
 const cardData: CardData = {
   label: '~',
   value: null,

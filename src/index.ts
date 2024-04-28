@@ -46,13 +46,13 @@ export const getRooms = () => rooms;
 
   ([
     'ten',
+    'slash',
+    'zero',
+    'slash',
+    'zero',
+    'two',
     'x',
-    'exclamation',
-    'five',
-    'exclamation',
-    'exclamation',
-    'x',
-    'minusfour'
+    'five'
   ] as Cards[]).forEach((card) => {
     tmpUser.cardStack.push(card)
     tmpUser.points.push(handlePointsSumTest(tmpUser))

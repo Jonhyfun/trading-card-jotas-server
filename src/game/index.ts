@@ -1,8 +1,23 @@
-import * as math from 'mathjs'
+import { create, all } from 'mathjs'
 import * as CardsObject from '../cards'
 import { ConnectedSocket, UserData } from "../initializers/webSocket";
 import { CardData, Cards, DeckCard } from '../cards/types';
 import { getRooms } from '..';
+
+const math = create(all)
+const originalDivide = math.divide;
+
+math.import({
+  divide: function (a, b) {
+    if (math.isZero(a)) {
+      return originalDivide(1, b)
+    }
+    if (math.isZero(b)) {
+      return originalDivide(a, 1)
+    }
+    return originalDivide(a, b);
+  }
+}, { override: true })
 
 const removeTrailingOperations = (operation: string) => {
   if (!operation || operation.length === 1) return operation
@@ -85,15 +100,15 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
     player.send(`setStance/${player.stance}`)
     player.send(`loadHand/${JSON.stringify(player.hand)}`)
     player.send(`loadMyStack/${JSON.stringify(player.cardStack)}`) //TODO juntar todos esses 6 sends?
-    player.send(`loadMyPoints/${player.points.slice(-1)[0]!.toFixed(2)}`)
+    player.send(`loadMyPoints/${(player.points.slice(-1)[0] ?? 0).toFixed(2)}`) //TODO nao era pra ter esse Nullable 0
 
   })
 
   attackingPlayer.send(`loadOtherStack/${JSON.stringify(defendingPlayer.cardStack)}`)
   defendingPlayer.send(`loadOtherStack/${JSON.stringify(attackingPlayer.cardStack)}`)
 
-  attackingPlayer.send(`loadOtherPoints/${defendingPlayer.points.slice(-1)[0]!.toFixed(2)}`)
-  defendingPlayer.send(`loadOtherPoints/${attackingPlayer.points.slice(-1)[0]!.toFixed(2)}`)
+  attackingPlayer.send(`loadOtherPoints/${(defendingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`)
+  defendingPlayer.send(`loadOtherPoints/${(attackingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`)
 
   if (attackingPlayer.hand.length === 0 || defendingPlayer.hand.length === 0) {
     const attackWins = (attackingPlayer.points.slice(-1)?.[0] ?? 0) > (defendingPlayer.points.slice(-1)?.[0] ?? 0);
@@ -106,41 +121,19 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
 
 const handlePointsSum = (user: UserData) => {
   const { cardStack: userStack } = user
-  let megaOperation = ['']
-
-  for (let i = 0; i < userStack.length; i += 2) {
-    const deckCard = CardsObject[userStack[i].card].default;
-    let megaOperationSnippet = (deckCard.operation ?? `${deckCard.value ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
-
-    if (i + 1 < userStack.length) {
-      const nextDeckCard = CardsObject[userStack[i + 1].card].default;
-      megaOperationSnippet += nextDeckCard.operation ?? (`${nextDeckCard.value ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
-    }
-
-    if (deckCard.operation === '.') {
-      megaOperation.push(megaOperationSnippet)
-    }
-
-    megaOperation[megaOperation.length - 1] += ` ${megaOperationSnippet}`;
-  }
-
-  console.log(`current ${(user as ConnectedSocket).ip} operation: ${equationSanitizer(removeTrailingOperations(megaOperation.join('+')))}`)
-
-  return math.evaluate(equationSanitizer(removeTrailingOperations(megaOperation.join('+')))) ?? 0
-
-}
-
-export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[] }) => {
-  const { cardStack: userStack } = user
   let operation = ''
 
   for (let i = 0; i < userStack.length; i += 2) {
-    const deckCard = CardsObject[userStack[i]].default;
+    let deckCard = CardsObject[userStack[i].card].default;
+    const nextDeckCard = CardsObject?.[userStack[i + 1]?.card]?.default ?? null;
+
+    if (nextDeckCard?.modifyPreviousCard) {
+      deckCard = nextDeckCard.modifyPreviousCard(deckCard)
+    }
+
     let operationSnippet = (deckCard.operation ?? `${deckCard.value ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
 
-    let nextDeckCard: CardData = null as any;
-    if (i + 1 < userStack.length) {
-      nextDeckCard = CardsObject[userStack[i + 1]].default;
+    if (nextDeckCard) {
       operationSnippet += nextDeckCard.operation ?? (`${nextDeckCard.value ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
     }
 
@@ -156,6 +149,35 @@ export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[]
   })
 
   console.log(`current operation: ${megaOperation}`)
-  return math.evaluate(megaOperation)
+  return math.evaluate(megaOperation) === Infinity ? 0 : math.evaluate(megaOperation)
+}
+
+export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[] }) => {
+  const { cardStack: userStack } = user
+  let operation = ''
+
+  for (let i = 0; i < userStack.length; i += 2) {
+    const deckCard = CardsObject[userStack[i]].default;
+    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+
+    let nextDeckCard: CardData = null as any;
+    if (i + 1 < userStack.length) {
+      nextDeckCard = CardsObject[userStack[i + 1]].default;
+      operationSnippet += nextDeckCard.operation ?? (`${(nextDeckCard.value === 0 || nextDeckCard.value) ? `${nextDeckCard.value > 0 ? '+' : ''}${nextDeckCard.value}` : ''}`)
+    }
+
+    operation += ` ${operationSnippet}`;
+  }
+
+  let megaOperation = '';
+  operation.split('.').forEach((_operation) => {
+    const sanitizedOperation = (equationSanitizer(removeTrailingOperations(_operation))).toString({ parenthesis: 'all' })
+    if (sanitizedOperation.match(/\d/g)) {
+      megaOperation += ` +(${sanitizedOperation})`
+    }
+  })
+
+  console.log(`current operation: ${math.parse(megaOperation).toString({ parenthesis: 'all' })}`)
+  return math.evaluate(megaOperation) === Infinity ? 0 : math.evaluate(megaOperation)
 
 }
