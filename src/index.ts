@@ -46,6 +46,7 @@ export const getRooms = () => rooms;
 
   if (isDev()) {
     ([
+      'slash',
       'exclamation',
       'minusfour',
       'x',
@@ -54,7 +55,7 @@ export const getRooms = () => rooms;
       'tilde',
       'exclamation',
       'slash',
-      'slash',
+      'ten',
       'zero',
       'x',
       'minusthree',

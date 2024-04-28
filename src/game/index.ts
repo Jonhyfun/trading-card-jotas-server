@@ -32,13 +32,17 @@ const removeTrailingOperations = (operation: string) => {
 
 const equationSanitizer = (equation: string) => {
   const nonCollidingChars = ['*', '/']
-  const equationChars = equation.replace(/\s/g, '').split('')
+  const equationChars = equation.split('')
 
   const indexToRemove = [] as number[]
   for (let i = equationChars.length - 1; i >= 0; i--) {
     if (nonCollidingChars.includes(equationChars[i])) {
-      if (equationChars[i - 1] && nonCollidingChars.includes(equationChars[i - 1])) {
-        indexToRemove.push(i - 1)
+      let lastSpace = 1;
+      while (equationChars[i - lastSpace] === ' ') {
+        lastSpace++
+      }
+      if (equationChars[i - lastSpace] && nonCollidingChars.includes(equationChars[i - lastSpace])) {
+        indexToRemove.push(i - lastSpace)
       }
     }
   }
@@ -148,7 +152,7 @@ const handlePointsSum = (user: UserData) => {
   }
 
   stackAsCards.forEach((deckCard) => {
-    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value >= 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
     operation += ` ${operationSnippet}`;
   })
 
@@ -178,7 +182,7 @@ export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[]
   }
 
   stackAsCards.forEach((deckCard) => {
-    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value > 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
+    let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value >= 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
     operation += ` ${operationSnippet}`;
   })
 
