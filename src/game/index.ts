@@ -30,8 +30,24 @@ const removeTrailingOperations = (operation: string) => {
   return operation
 }
 
-const equationSanitizer = (equation) => {
-  return equation.replace(/\./g, "").replace(/([*\/])\s(([*\/])\s){1,}(?!\d)/g, "")
+const equationSanitizer = (equation: string) => {
+  const nonCollidingChars = ['*', '/']
+  const equationChars = equation.replace(/\s/g, '').split('')
+
+  const indexToRemove = [] as number[]
+  for (let i = equationChars.length - 1; i >= 0; i--) {
+    if (nonCollidingChars.includes(equationChars[i])) {
+      if (equationChars[i - 1] && nonCollidingChars.includes(equationChars[i - 1])) {
+        indexToRemove.push(i - 1)
+      }
+    }
+  }
+
+  indexToRemove.forEach((i) => {
+    equationChars[i] = ''
+  })
+
+  return equationChars.join('')
 };
 
 export const onUserSetCard = (player: ConnectedSocket, card: DeckCard) => {
@@ -144,7 +160,7 @@ const handlePointsSum = (user: UserData) => {
     }
   })
 
-  console.log(`current operation: ${megaOperation}`)
+  console.log(`current operation ${(user as ConnectedSocket).ip}: ${megaOperation}`)
   return math.evaluate(megaOperation) ?? 0
 
 }
@@ -168,7 +184,7 @@ export const handlePointsSumTest = (user: { points: number[], cardStack: Cards[]
 
   let megaOperation = '';
   operation.split('.').forEach((_operation) => {
-    const sanitizedOperation = (math.parse(equationSanitizer(removeTrailingOperations(_operation)))).toString({ parenthesis: 'all' })
+    const sanitizedOperation = ((equationSanitizer(removeTrailingOperations(_operation))))
     if (sanitizedOperation.match(/\d/g)) {
       megaOperation += ` +(${sanitizedOperation})`
     }

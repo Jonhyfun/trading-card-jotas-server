@@ -6,7 +6,7 @@ const cardData: CardData = {
   label: '~',
   value: null,
   ghost: true,
-  limit: 1,
+  limit: 2,
   modifyPreviousCard: (card: CardData) => {
     return { ...card, value: card.value ? card.value * -1 : card.value }
   },
