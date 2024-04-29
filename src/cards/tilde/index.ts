@@ -7,6 +7,7 @@ const cardData: CardData = {
   value: null,
   ghost: true,
   limit: 2,
+  desc: 'Inverte o sinal da carta anterior.',
   modifyPreviousCard: (card: CardData) => {
     return { ...card, value: card.value ? card.value * -1 : card.value }
   },

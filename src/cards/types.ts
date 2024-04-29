@@ -3,7 +3,7 @@ import * as cards from './index'
 
 export type Cards = keyof typeof cards
 export type DeckCard = {
-  card: Cards
+  cardKey: Cards
   id: string
 }
 

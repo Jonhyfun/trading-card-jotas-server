@@ -6,7 +6,7 @@ const cardData: CardData = {
   value: null,
   limit: 2,
   priority: 1,
-  desc: 'Essa carta se transforma em uma carta aleatória da pilha que ela for colocada ignorando os efeitos.',
+  desc: 'Essa carta se transforma em uma carta aleatória da pilha que ela foi colocada ignorando os efeitos.',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
     if (castingPlayer.cardStack.length <= 1) return
 

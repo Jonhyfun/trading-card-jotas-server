@@ -87,8 +87,8 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   if (secondPendingEffect) secondPendingEffect();
 
   //? Clonando as cartas pra não travar efeitos que modificarem a stack no primeiro effect
-  const attackingCard = CardsObject[attackingPlayer.cardStack.slice(-1)[0].card].default
-  const defenseCard = CardsObject[defendingPlayer.cardStack.slice(-1)[0].card].default
+  const attackingCard = CardsObject[attackingPlayer.cardStack.slice(-1)[0].cardKey].default
+  const defenseCard = CardsObject[defendingPlayer.cardStack.slice(-1)[0].cardKey].default
 
   if ((attackingCard.priority ?? 0) > (defenseCard.priority ?? 0)) {
     attackingCard.effect(attackingPlayer, defendingPlayer);
@@ -145,7 +145,7 @@ const handlePointsSum = (user: UserData) => {
 
   const stackAsCards = [] as CardData[]
   for (let i = 0; i < userStack.length; i++) {
-    stackAsCards[i] = CardsObject[userStack[i].card].default;
+    stackAsCards[i] = CardsObject[userStack[i].cardKey].default;
     if (stackAsCards[i].modifyPreviousCard && i !== 0) {
       stackAsCards[i - 1] = stackAsCards[i].modifyPreviousCard!(stackAsCards[i - 1])
     }

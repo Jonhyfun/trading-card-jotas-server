@@ -6,6 +6,7 @@ const cardData: CardData = {
   value: 2,
   limit: 1,
   operation: '.',
+  desc: 'Essa carta anda duas casas para trás.',
   effect: (pileOwner: UserData, otherPlayer: UserData) => {
     const cards = pileOwner.cardStack.splice(-3);
     const and = cards.splice(-1)

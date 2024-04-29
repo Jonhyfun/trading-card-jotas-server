@@ -9,8 +9,8 @@ const baseSetCurrentDeck = (ws: ConnectedSocket, payload: string) => {
     const selectedCards = JSON.parse(payload) as Cards[]
     if (selectedCards && selectedCards.length) {
       ws.deck = []
-      selectedCards.forEach((card, i) => {
-        ws.deck.push(({ card, id: `${i}-${makeId(8)}` }))
+      selectedCards.forEach((cardKey, i) => {
+        ws.deck.push(({ cardKey, id: `${i}-${makeId(8)}` }))
       })
       console.log(`${ws.ip} salvou o deck`)
       return true

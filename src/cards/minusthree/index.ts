@@ -5,6 +5,7 @@ const cardData: CardData = {
   label: '-3',
   value: -3,
   limit: 3,
+  desc: 'Essa carta vale -3.',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => { }
 }
 

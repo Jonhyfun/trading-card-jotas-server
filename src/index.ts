@@ -2,7 +2,6 @@ import * as routes from './routes';
 import * as cards from './cards'; //TODO watch the folder to update in real time?
 import { InitializeExpress } from './initializers/express';
 import { ConnectedSocket, InitializeWebSocket } from './initializers/webSocket';
-import { evaluate } from 'mathjs';
 import { Cards } from './cards/types';
 import { handlePointsSumTest } from './game';
 import { isDev } from './utils/meta';

@@ -35,6 +35,7 @@ Comentarios =
 joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
 --forna = Inverte o sinal do total atual
 eu = carta que embaralha a pilha aleatoriamente? kkkkk
+marc = cores
 
 rene = historico de pontos
 
