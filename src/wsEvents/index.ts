@@ -80,6 +80,9 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
       ws.send(`setStance/${ws.stance}`);
       console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
       ws.send('joinedRoom')
+
+      current[joinData.room][0].send('setGameState/running')
+      ws.send('setGameState/running')
       return { ...current, [joinData.room]: [current[joinData.room][0], ws] }
     }
 

@@ -134,8 +134,8 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
     const attackWins = (attackingPlayer.points.slice(-1)?.[0] ?? 0) > (defendingPlayer.points.slice(-1)?.[0] ?? 0);
     const defenseWins = (defendingPlayer.points.slice(-1)?.[0] ?? 0) > (attackingPlayer.points.slice(-1)?.[0] ?? 0);
 
-    attackingPlayer.send(`${attackWins ? 'success' : 'error'}/${attackWins ? 'Você venceu!' : 'Você perdeu...'}`)
-    defendingPlayer.send(`${defenseWins ? 'success' : 'error'}/${defenseWins ? 'Você venceu!' : 'Você perdeu...'}`)
+    attackingPlayer.send(`${attackWins ? 'endWining' : 'endLosing'}/${attackWins ? 'Você venceu!' : 'Você perdeu...'}`)
+    defendingPlayer.send(`${defenseWins ? 'endWining' : 'endLosing'}/${defenseWins ? 'Você venceu!' : 'Você perdeu...'}`)
   }
 }
 

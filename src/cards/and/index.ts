@@ -4,7 +4,7 @@ import { CardData } from "../types"
 const cardData: CardData = {
   label: '&',
   value: 2,
-  limit: 1,
+  limit: 2,
   operation: '.',
   desc: 'Essa carta anda duas casas para trás.',
   effect: (pileOwner: UserData, otherPlayer: UserData) => {
