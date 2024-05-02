@@ -46,6 +46,7 @@ export const getRooms = () => rooms;
 
   if (isDev()) {
     ([
+      'tilde',
       'slash',
       'slash',
       'slash',
@@ -53,7 +54,12 @@ export const getRooms = () => rooms;
       'slash',
       'ten',
       'x',
-      'ten'
+      'ten',
+      'exclamation',
+      'tilde',
+      'tilde',
+      'ten',
+      'slash'
     ] as Cards[]).forEach((card, i) => {
       tmpUser.cardStack!.push({ cardKey: card, id: `card-${i}` })
 
@@ -62,7 +68,7 @@ export const getRooms = () => rooms;
       tmpUser.points!.push(handlePointsSum(tmpUser as UserData, parsedCards))
       handleVisualEffects(tmpUser as UserData, parsedCards)
 
-      //console.log(tmpUser.points)
+      console.log(tmpUser.points)
       console.log(tmpUser.cardVisualEffects)
     })
     //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))

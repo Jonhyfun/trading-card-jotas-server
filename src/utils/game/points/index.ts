@@ -21,7 +21,13 @@ math.import({
 export const handlePointsSum = (user: UserData, stackAsCards: CardData[]) => {
   let operation = ''
 
-  stackAsCards.forEach((deckCard) => {
+  stackAsCards.forEach((deckCard, i) => {
+    const nextDeckCard = stackAsCards?.[i + 1];
+
+    if (nextDeckCard?.modifyPreviousCard) {
+      deckCard = nextDeckCard.modifyPreviousCard(deckCard)
+    }
+
     let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value >= 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
     operation += ` ${operationSnippet}`;
   })
