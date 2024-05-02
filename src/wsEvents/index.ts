@@ -40,6 +40,7 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
     stance: 'attack',
     operation: '',
     points: [],
+    cardVisualEffects: [],
     pendingEffects: [],
     globalEffects: [],
     hand: [],
@@ -68,7 +69,6 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
 
       return { ...current, [joinData.room]: [...current[joinData.room], ws] }
     }
-
 
     if (!ws.deck || ws.deck.length !== 20) {
       ws.send('error/Deck inválido!')

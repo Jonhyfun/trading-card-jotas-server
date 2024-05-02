@@ -14,6 +14,12 @@ export const cardImage: Route = (app) => {
   })
 }
 
+export const visualEffects: Route = (app) => {
+  app.get('/visualEffects/:effectName', (req, res) => {
+    return res.sendFile(`/${req.params.effectName.split('.')[0]}/${req.params.effectName.split('.')[0]}.png`, { root: 'src/visualEffects' }, (err) => res.status(404).send((err)))
+  })
+}
+
 export const getCards: Route = (app) => {
   app.get('/cards', (req, res) => {
     const result = Object.entries(cards).map(([cardKey, { default: cardData }]) => {

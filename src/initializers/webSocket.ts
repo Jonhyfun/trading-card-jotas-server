@@ -8,6 +8,7 @@ import type { Express } from 'express';
 import type { WebSocket } from 'ws';
 import { DeckCard } from '../cards/types';
 import { isDev } from '../utils/meta';
+import { getRandomArbitrary } from '../utils/random';
 
 export interface UserData {
   hand: DeckCard[]
@@ -15,6 +16,7 @@ export interface UserData {
   deck: DeckCard[]
   points: (number | null)[]
   cardStack: DeckCard[]
+  cardVisualEffects: ('overwritten')[]
   hiddenCards: DeckCard['id'][]
   currentSetCard?: DeckCard
   globalEffects: ('invertedOdds' | 'sendRepeatedTurn')[]
@@ -36,7 +38,11 @@ export function InitializeWebSocket(app: Express) {
   const wss = new WebSocketServer({ server, maxPayload: 2 * 1024 }); //2kb
 
   wss.on('connection', (ws: WebSocket & ConnectedSocket, req) => {
-    ws.ip = req.socket.remoteAddress!.toString()// + getRandomArbitrary(0, 100);
+    ws.ip = req.socket.remoteAddress!.toString()
+
+    if (isDev()) {
+      ws.ip += getRandomArbitrary(0, 100)
+    }
 
     ws.on('message', (data) => {
       const [key, ...value] = data.toString().split('/')

@@ -1,10 +1,11 @@
 import * as routes from './routes';
-import * as cards from './cards'; //TODO watch the folder to update in real time?
+import * as CardsObject from './cards'; //TODO watch the folder to update in real time?
 import { InitializeExpress } from './initializers/express';
-import { ConnectedSocket, InitializeWebSocket } from './initializers/webSocket';
+import { ConnectedSocket, InitializeWebSocket, UserData } from './initializers/webSocket';
 import { Cards } from './cards/types';
-import { handlePointsSumTest } from './game';
 import { isDev } from './utils/meta';
+import { handlePointsSum } from './utils/game/points';
+import { handleVisualEffects } from './utils/game/visual';
 
 type RoomType = { [key in string]: ConnectedSocket[] }
 let rooms: RoomType = {};
@@ -26,7 +27,7 @@ export const getRooms = () => rooms;
 
   console.log();
   console.log('-----------------')
-  console.log(`| \x1b[33mCards\x1b[0m: ${Object.keys(cards).join(', ')}`);
+  console.log(`| \x1b[33mCards\x1b[0m: ${Object.keys(CardsObject).join(', ')}`);
   console.log('-----------------')
 
   console.log();
@@ -40,28 +41,29 @@ export const getRooms = () => rooms;
   console.log('-----------------')
 
   const tmpUser = {
-    points: [], cardStack: []
-  };
+    points: [], cardStack: [], cardVisualEffects: [], ip: 'TESTE'
+  } as Partial<UserData>
 
   if (isDev()) {
     ([
       'slash',
-      'exclamation',
-      'minusfour',
-      'x',
       'slash',
-      'minusthree',
-      'tilde',
+      'slash',
       'exclamation',
       'slash',
       'ten',
-      'zero',
       'x',
-      'minusthree',
-    ] as Cards[]).forEach((card) => {
-      tmpUser.cardStack.push(card)
-      tmpUser.points.push(handlePointsSumTest(tmpUser))
-      console.log(tmpUser.points)
+      'ten'
+    ] as Cards[]).forEach((card, i) => {
+      tmpUser.cardStack!.push({ cardKey: card, id: `card-${i}` })
+
+      const parsedCards = tmpUser.cardStack!.map(({ cardKey }) => CardsObject[cardKey].default)
+
+      tmpUser.points!.push(handlePointsSum(tmpUser as UserData, parsedCards))
+      handleVisualEffects(tmpUser as UserData, parsedCards)
+
+      //console.log(tmpUser.points)
+      console.log(tmpUser.cardVisualEffects)
     })
     //console.log(evaluate('-4 -3 +10 -4 +1 +5 +10'))
 
