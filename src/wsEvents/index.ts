@@ -1,7 +1,9 @@
-import { setRooms } from "..";
+import { deleteRoom, getRooms, setRooms } from "..";
 import { Cards, DeckCard } from "../cards/types";
 import { onUserSetCard } from "../game";
 import { ConnectedSocket } from "../initializers/webSocket";
+import { initialUserData as shallowInitialUserData } from "../utils/mock";
+import { deepCopy } from "../utils/object";
 import { makeId, shuffle } from "../utils/random";
 
 const baseSetCurrentDeck = (ws: ConnectedSocket, payload: string) => {
@@ -27,6 +29,22 @@ export const setCurrentDeckWithMessage = (ws: ConnectedSocket, payload: string) 
   }
 }
 
+const removeUserFromRoom = (ws: ConnectedSocket, room: string) => {
+  setRooms((current) => {
+    const roomWithoutLeavingUser = current[room]?.filter((user) => user.ip !== ws.ip)
+    if (!roomWithoutLeavingUser) return current
+
+    if (roomWithoutLeavingUser.length === 0) {
+      const newCurrent = { ...current }
+      delete newCurrent[room]
+      return newCurrent
+    }
+    return { ...current, [room]: roomWithoutLeavingUser }
+  })
+}
+
+export const leaveRoom = removeUserFromRoom
+
 export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   const joinData = JSON.parse(payload) as { room: string, deck?: string[] }
   if (!joinData?.room) return
@@ -35,23 +53,23 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
     baseSetCurrentDeck(ws, JSON.stringify(joinData.deck))
   }
 
-  const initialUserData = {
-    room: joinData.room,
-    stance: 'attack',
-    operation: '',
-    points: [],
-    cardVisualEffects: [],
-    pendingEffects: [],
-    globalEffects: [],
-    hand: [],
-    hiddenCards: [],
-    cardStack: []
-  }
+  const initialUserData = deepCopy(shallowInitialUserData)
+  initialUserData.room = joinData.room
 
-  //? WebSocket não suporta spread (e tem muita coisa dentro que poderia cagar a performance)
+  //? (o tipo) WebSocket não suporta spread (e tem muita coisa dentro que poderia cagar a performance)
   Object.entries(initialUserData).forEach(([key, value]) => {
     ws[key] = value;
   })
+
+  ws.room = joinData.room
+
+  const onUserJoinRoom = () => {
+    ws.onclose = () => {
+      removeUserFromRoom(ws, joinData.room)
+    }
+    ws.send(`setStance/${ws.stance}`);
+    ws.send('joinedRoom')
+  }
 
   setRooms((current) => {
     const alreadyConnectedUserIndex = current[joinData.room] ? current[joinData.room].findIndex(({ ip }) => ip === ws.ip) : -1
@@ -63,9 +81,9 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
         ws[key] = removedUser[key]
       })
 
-      ws.send(`setStance/${ws.stance}`);
+
+      onUserJoinRoom()
       console.log(`${ws.ip} reconectou em ${joinData.room} como ${ws.stance}`)
-      ws.send('joinedRoom')
 
       return { ...current, [joinData.room]: [...current[joinData.room], ws] }
     }
@@ -76,19 +94,23 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
       return current
     }
 
+    if (current[joinData.room]?.length === 2) {
+      ws.send('error/Sala cheia!')
+      ws.send('redirect/rooms')
+      return current
+    }
+
     if (current[joinData.room]?.[0]) {
-      ws.send(`setStance/${ws.stance}`);
+      onUserJoinRoom()
       console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
-      ws.send('joinedRoom')
 
       current[joinData.room][0].send('setGameState/running')
       ws.send('setGameState/running')
       return { ...current, [joinData.room]: [current[joinData.room][0], ws] }
     }
 
-    ws.send(`setStance/${ws.stance}`);
+    onUserJoinRoom()
     console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
-    ws.send('joinedRoom')
     return { ...current, [joinData.room]: [ws] }
   })
 }
@@ -109,6 +131,7 @@ export const fetchHand = (ws: ConnectedSocket) => {
     console.log('fetchou')
     ws.ingameDeck = ws.deck
     shuffle(ws.ingameDeck)
+    ws.ingameDeck = ws.ingameDeck.slice(0, 2)
     ws.hand = ws.ingameDeck.splice(0, 5)
   }
   ws.send(`loadHand/${JSON.stringify(ws.hand)}`)

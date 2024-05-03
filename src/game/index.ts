@@ -1,9 +1,11 @@
 import * as CardsObject from '../cards'
 import { ConnectedSocket } from "../initializers/webSocket";
 import { DeckCard } from '../cards/types';
-import { getRooms } from '..';
+import { deleteRoom, getRooms, setRooms } from '..';
 import { handlePointsSum } from '../utils/game/points';
 import { handleVisualEffects } from '../utils/game/visual';
+import { initialUserData } from '../utils/mock';
+import { deepCopy } from '../utils/object';
 
 const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSocket) => {
   const firstPendingEffect = attackingPlayer.pendingEffects.shift();
@@ -72,7 +74,16 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
     const defenseWins = (defendingPlayer.points.slice(-1)?.[0] ?? 0) > (attackingPlayer.points.slice(-1)?.[0] ?? 0);
 
     attackingPlayer.send(`${attackWins ? 'endWining' : 'endLosing'}/${attackWins ? 'Você venceu!' : 'Você perdeu...'}`)
-    defendingPlayer.send(`${defenseWins ? 'endWining' : 'endLosing'}/${defenseWins ? 'Você venceu!' : 'Você perdeu...'}`)
+    defendingPlayer.send(`${defenseWins ? 'endWining' : 'endLosing'}/${defenseWins ? 'Você venceu!' : 'Você perdeu...'}`);
+
+    [attackingPlayer, defendingPlayer].forEach((player) => {
+      Object.entries(deepCopy(initialUserData)).forEach(([key, value]) => {
+        player[key] = value;
+      })
+      player.room = null
+    })
+
+    deleteRoom(attackingPlayer.room!)
   }
 }
 
@@ -80,7 +91,7 @@ export const onUserSetCard = (player: ConnectedSocket, card: DeckCard) => {
   if (!player.currentSetCard) {
     player.currentSetCard = card
 
-    const roomPlayers = getRooms()[player.room]
+    const roomPlayers = getRooms()[player.room!]
     const otherPlayer = roomPlayers.find(({ ip }) => ip !== player.ip)
 
     if (!otherPlayer) return player.send('error/Sala vazia!')

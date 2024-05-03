@@ -1,10 +1,17 @@
 import { Cards } from "../cards/types";
 import { Route } from "./types";
 import * as cards from '../cards';
+import { getRooms } from "..";
 
 export const example: Route = (app) => {
   app.post('/example', (req, res) => {
     return res.send('user posted');
+  })
+}
+
+export const rooms: Route = (app) => {
+  app.get('/rooms', (req, res) => {
+    return res.send(Object.entries(getRooms()).map(([key, players]) => ({ room: key, playerCount: players.length })));
   })
 }
 

@@ -21,7 +21,7 @@ export interface UserData {
   currentSetCard?: DeckCard
   globalEffects: ('invertedOdds' | 'sendRepeatedTurn')[]
   pendingEffects: (() => void)[]
-  room: string
+  room: string | null
   stance: 'attack' | 'defense'
 }
 
