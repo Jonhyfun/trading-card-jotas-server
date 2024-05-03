@@ -131,7 +131,6 @@ export const fetchHand = (ws: ConnectedSocket) => {
     console.log('fetchou')
     ws.ingameDeck = ws.deck
     shuffle(ws.ingameDeck)
-    ws.ingameDeck = ws.ingameDeck.slice(0, 2)
     ws.hand = ws.ingameDeck.splice(0, 5)
   }
   ws.send(`loadHand/${JSON.stringify(ws.hand)}`)
