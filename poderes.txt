@@ -25,6 +25,10 @@
 	
 	~ = inverte o sinal da carta anterior [1]
 
+	Carta que copia a carta anterior
+	Carta que copia a carta do oponente
+	adicionar icone de interrogação nas cartas "clonadas"
+
 	
 
 

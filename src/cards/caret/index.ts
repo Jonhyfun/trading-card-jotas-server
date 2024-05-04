@@ -3,8 +3,8 @@ import { CardData } from "../types"
 
 const cardData: CardData = {
   label: '^',
-  value: 0,
   ghost: true,
+  value: null,
   limit: 1,
   desc: 'Mova a carta anterior para trás.',
   effect: (castingPlayer: UserData, otherPlayer: UserData) => {
