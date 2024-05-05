@@ -82,16 +82,19 @@ export const getRooms = () => rooms;
     setRooms(() => ({ ['TEST']: [userA, userB] }))
 
     onUserSetCard(userA, { cardKey: 'one', id: 'NEW-CARD-A' })
-    onUserSetCard(userB, { cardKey: 'ten', id: 'NEW-CARD-B' })
+    onUserSetCard(userB, { cardKey: 'slash', id: 'NEW-CARD-B' })
 
-    onUserSetCard(userA, { cardKey: 'three', id: 'NEW-CARD-A-2' })
+    onUserSetCard(userA, { cardKey: 'two', id: 'NEW-CARD-A-2' })
     onUserSetCard(userB, { cardKey: 'zero', id: 'NEW-CARD-B-2' })
 
-    onUserSetCard(userA, { cardKey: 'five', id: 'NEW-CARD-A-3' })
+    onUserSetCard(userA, { cardKey: 'asterisk', id: 'NEW-CARD-A-3' })
     onUserSetCard(userB, { cardKey: 'two', id: 'NEW-CARD-B-3' })
 
+    onUserSetCard(userA, { cardKey: 'zero', id: 'NEW-CARD-A-4' })
+    onUserSetCard(userB, { cardKey: 'asterisk', id: 'NEW-CARD-B-4' })
+
     onUserSetCard(userA, { cardKey: 'one', id: 'NEW-CARD-A-4' })
-    onUserSetCard(userB, { cardKey: 'exclamation', id: 'NEW-CARD-B-4' })
+    onUserSetCard(userB, { cardKey: 'ten', id: 'NEW-CARD-B-4' })
 
     console.log(userA.cardStack.map(({ cardKey }) => cardKey))
     console.log(userB.cardStack.map(({ cardKey }) => cardKey))

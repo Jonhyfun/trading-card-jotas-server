@@ -23,33 +23,23 @@
 	# (-3) = No próximo turno você e seu oponente continuam na mesma pilha (fantasma) [1]
 	& (2) = Essa carta volta 3 casas e vale 2 [1]
 	
-	~ = inverte o sinal da carta anterior [1]
+	~ = inverte o sinal da carta anterior [2]
 
-	Carta que copia a carta anterior
-	Carta que copia a carta do oponente
-	adicionar icone de interrogação nas cartas "clonadas"
-	roda o efeito da carta anterior novamente (se tiver)
+	* = Copia a carta anterior [2]
+	| =  Copia a carta do oponente [2]
+	
+	< = puxa a operação mais próxima para antes dessa carta [2]
 
 	
 
 
-fantasma - A carta é pulada em efeitos que consideram "a próxima carta" (caso a carta tenha valor, o valor só é aplicado diretamente ao total.
+	fantasma - A carta é pulada em efeitos que consideram "a próxima carta" (caso a carta tenha valor, o valor só é aplicado diretamente ao total.
 
 
 Comentarios = 
-joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
+--joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
 --forna = Inverte o sinal do total atual
-eu = carta que embaralha a pilha aleatoriamente? kkkkk
+--eu = carta que embaralha a pilha aleatoriamente? kkkkk
 marc = cores
 
 rene = historico de pontos
-
-
-exclamacao com & da merda
-
-
-alguma coisa bugou a hashtag talvez com a interrogação e eu fiquei eternamente na outra pilha?
-o hashtag ta trocando os turnos muito rápido kkkk
-
-
-começar com multiplicação quebra tudo

@@ -16,7 +16,7 @@ export interface UserData {
   deck: DeckCard[]
   points: (number | null)[]
   cardStack: DeckCard[]
-  cardVisualEffects: ('overwritten')[]
+  cardVisualEffects: ('overwritten' | 'copied' | 'ghost')[]
   hiddenCards: DeckCard['id'][]
   currentSetCard?: DeckCard
   globalEffects: ('invertedOdds' | 'sendRepeatedTurn')[]

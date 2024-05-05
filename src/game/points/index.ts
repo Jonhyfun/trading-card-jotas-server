@@ -25,7 +25,20 @@ export const handlePointsSum = (user: UserData, stackAsCards: CardData[]) => {
     const nextDeckCard = stackAsCards?.[i + 1];
 
     if (nextDeckCard?.modifyPreviousCard) {
-      deckCard = nextDeckCard.modifyPreviousCard(deckCard)
+      if (deckCard.ghost) {
+        let notGhostIndex = -1;
+        for (let i = stackAsCards.length - 1; i >= 0; i--) {
+          if (!stackAsCards[i].ghost) {
+            notGhostIndex = i
+          }
+        }
+        if (notGhostIndex !== -1) {
+          stackAsCards[notGhostIndex] = nextDeckCard.modifyPreviousCard(stackAsCards[notGhostIndex])
+        }
+      }
+      else {
+        deckCard = nextDeckCard.modifyPreviousCard(deckCard)
+      }
     }
 
     let operationSnippet = (deckCard.operation ?? `${(deckCard.value === 0 || deckCard.value) ? `${deckCard.value >= 0 ? '+' : ''}${deckCard.value}` : ''}`) + ' '
