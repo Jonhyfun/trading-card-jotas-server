@@ -28,6 +28,7 @@
 	Carta que copia a carta anterior
 	Carta que copia a carta do oponente
 	adicionar icone de interrogação nas cartas "clonadas"
+	roda o efeito da carta anterior novamente (se tiver)
 
 	
 

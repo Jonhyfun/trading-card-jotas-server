@@ -4,7 +4,7 @@ import * as cards from './index'
 export type Cards = keyof typeof cards
 export type DeckCard = {
   cardKey: Cards
-  id: string
+  id: string,
 }
 
 export type CardData = {
@@ -16,5 +16,5 @@ export type CardData = {
   priority?: 1 | 2,
   limit: 1 | 2 | 3,
   modifyPreviousCard?: (card: CardData) => CardData
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => void
+  effect: (cardOwner: UserData, otherPlayer: UserData) => void
 }

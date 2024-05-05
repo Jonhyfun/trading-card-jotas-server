@@ -10,7 +10,7 @@ const cardData: CardData = {
   modifyPreviousCard: (card: CardData) => {
     return { ...card, value: card.value ? card.value * -1 : card.value }
   },
-  effect: (pileOwner: UserData, otherPlayer: UserData) => {
+  effect: (cardOwner: UserData, otherPlayer: UserData) => {
 
   }
 }

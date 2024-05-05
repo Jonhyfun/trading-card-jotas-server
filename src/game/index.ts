@@ -14,18 +14,19 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
   const secondPendingEffect = defendingPlayer.pendingEffects.shift();
   if (secondPendingEffect) secondPendingEffect();
 
-  //? Clonando as cartas pra não travar efeitos que modificarem a stack no primeiro effect
-  const attackingCard = CardsObject[attackingPlayer.cardStack.slice(-1)[0].cardKey].default
-  const defenseCard = CardsObject[defendingPlayer.cardStack.slice(-1)[0].cardKey].default
+  const cards = [
+    { card: CardsObject[attackingPlayer.cardStack.slice(-1)[0].cardKey].default, owner: attackingPlayer, id: attackingPlayer.cardStack.slice(-1)[0].id },
+    { card: CardsObject[defendingPlayer.cardStack.slice(-1)[0].cardKey].default, owner: defendingPlayer, id: defendingPlayer.cardStack.slice(-1)[0].id }
+  ]
 
-  if ((attackingCard.priority ?? 0) > (defenseCard.priority ?? 0)) {
-    attackingCard.effect(attackingPlayer, defendingPlayer);
-    defenseCard.effect(defendingPlayer, attackingPlayer);
-  }
-  else {
-    defenseCard.effect(defendingPlayer, attackingPlayer);
-    attackingCard.effect(attackingPlayer, defendingPlayer);
-  }
+  const [{ card: firstCard, owner: firstCardOwner, id: firstCardId }] = cards.sort((a, b) => (b.card.priority ?? 0) - (a.card.priority ?? 0)).splice(0, 1)
+  const [{ card: otherCard, owner: otherCardOwner, id: otherCardId }] = cards.splice(0, 1)
+
+  firstCard.effect(firstCardOwner, otherCardOwner);
+
+  //? Se depois do primeiro efeito o dono das cartas trocou, troca a ordem dos argumentos do efeito pra refletir isso (RIP POO)
+  if (firstCardOwner.cardStack.slice(-1)[0].id === otherCardId || otherCardOwner.cardStack.slice(-1)[0].id === firstCardId) otherCard.effect(firstCardOwner, otherCardOwner);
+  else otherCard.effect(otherCardOwner, firstCardOwner);
 
   const attackingPlayerStack = attackingPlayer.cardStack.map(({ cardKey }) => CardsObject[cardKey].default)
   const defendingPlayerStack = defendingPlayer.cardStack.map(({ cardKey }) => CardsObject[cardKey].default)

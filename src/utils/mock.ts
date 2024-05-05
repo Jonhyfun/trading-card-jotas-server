@@ -13,11 +13,12 @@ export const initialUserData = {
   cardStack: []
 }
 
-export const getMockConnectedUser = (room: string, ip: string, deck: DeckCard[]): UserData & Pick<ConnectedSocket, 'ip'> => ({
+export const getMockConnectedUser = (room: string, ip: string, deck: DeckCard[]): UserData & Pick<ConnectedSocket, 'ip' | 'send'> => ({
   ...initialUserData,
-  ingameDeck: [],
+  ingameDeck: deck,
   stance: 'attack',
   room,
   ip,
   deck,
+  send: () => { }
 })

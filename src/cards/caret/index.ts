@@ -7,16 +7,16 @@ const cardData: CardData = {
   value: null,
   limit: 1,
   desc: 'Mova a carta anterior para trás.',
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    if (castingPlayer.cardStack.length === 1) return
+  effect: (cardOwner: UserData, otherPlayer: UserData) => {
+    if (cardOwner.cardStack.length === 1) return
 
-    if (castingPlayer.cardStack.length < 3) {
-      castingPlayer.cardStack = [castingPlayer.cardStack[1], castingPlayer.cardStack[0]]
+    if (cardOwner.cardStack.length < 3) {
+      cardOwner.cardStack = [cardOwner.cardStack[1], cardOwner.cardStack[0]]
       return
     }
 
-    const movedCard = castingPlayer.cardStack.splice(-2, 1)
-    castingPlayer.cardStack = [...castingPlayer.cardStack.slice(0, -2), ...movedCard, castingPlayer.cardStack.slice(-2)[0], castingPlayer.cardStack.slice(-2)[1]]
+    const movedCard = cardOwner.cardStack.splice(-2, 1)
+    cardOwner.cardStack = [...cardOwner.cardStack.slice(0, -2), ...movedCard, cardOwner.cardStack.slice(-2)[0], cardOwner.cardStack.slice(-2)[1]]
   }
 }
 

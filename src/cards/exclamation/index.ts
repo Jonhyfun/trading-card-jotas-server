@@ -8,12 +8,12 @@ const cardData: CardData = {
   operation: '.',
   desc: 'Troca essa carta com a carta jogada na outra pilha.',
   priority: 2,
-  effect: (castingPlayer: UserData, otherPlayer: UserData) => {
-    const lastCastingPlayerCard = castingPlayer.cardStack.splice(-1, 1)
+  effect: (cardOwner: UserData, otherPlayer: UserData) => {
+    const lastCastingPlayerCard = cardOwner.cardStack.splice(-1, 1)
     const lastOtherPlayerCard = otherPlayer.cardStack.splice(-1, 1)
 
     if (lastCastingPlayerCard.length === 1 && lastOtherPlayerCard.length === 1) {
-      castingPlayer.cardStack.push(lastOtherPlayerCard[0])
+      cardOwner.cardStack.push(lastOtherPlayerCard[0])
       otherPlayer.cardStack.push(lastCastingPlayerCard[0])
     }
   }
