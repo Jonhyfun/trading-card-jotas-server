@@ -4,8 +4,8 @@ import { InitializeExpress } from './initializers/express';
 import { ConnectedSocket, InitializeWebSocket, UserData } from './initializers/webSocket';
 import { Cards } from './cards/types';
 import { isDev } from './utils/meta';
-import { handlePointsSum } from './utils/game/points';
-import { handleVisualEffects } from './utils/game/visual';
+import { handlePointsSum } from './game/points';
+import { handleVisualEffects } from './game/visual';
 
 type RoomType = { [key in string]: ConnectedSocket[] }
 let rooms: RoomType = {};

@@ -1,9 +1,9 @@
 import * as CardsObject from '../cards'
 import { ConnectedSocket } from "../initializers/webSocket";
 import { DeckCard } from '../cards/types';
-import { deleteRoom, getRooms, setRooms } from '..';
-import { handlePointsSum } from '../utils/game/points';
-import { handleVisualEffects } from '../utils/game/visual';
+import { deleteRoom, getRooms } from '..';
+import { handlePointsSum } from './points';
+import { handleVisualEffects } from './visual';
 import { initialUserData } from '../utils/mock';
 import { deepCopy } from '../utils/object';
 

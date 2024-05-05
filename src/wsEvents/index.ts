@@ -1,4 +1,4 @@
-import { deleteRoom, getRooms, setRooms } from "..";
+import { setRooms } from "..";
 import { Cards, DeckCard } from "../cards/types";
 import { onUserSetCard } from "../game";
 import { ConnectedSocket } from "../initializers/webSocket";

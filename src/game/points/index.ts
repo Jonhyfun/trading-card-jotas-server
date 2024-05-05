@@ -1,5 +1,5 @@
-import { CardData } from "../../../cards/types";
-import { ConnectedSocket, UserData } from "../../../initializers/webSocket";
+import { CardData } from "../../cards/types";
+import { ConnectedSocket, UserData } from "../../initializers/webSocket";
 import { equationSanitizer, removeTrailingOperations } from "../sanitation";
 import { create, all } from 'mathjs'
 
