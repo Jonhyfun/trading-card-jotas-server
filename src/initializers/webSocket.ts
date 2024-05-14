@@ -8,7 +8,7 @@ import type { Express } from 'express';
 import type { WebSocket } from 'ws';
 import { DeckCard } from '../cards/types';
 import { isDev } from '../utils/meta';
-import { getRandomArbitrary } from '../utils/random';
+import { getAuth } from 'firebase-admin/auth';
 
 export interface UserData {
   hand: DeckCard[]
@@ -37,26 +37,27 @@ export function InitializeWebSocket(app: Express) {
 
   const wss = new WebSocketServer({ server, maxPayload: 2 * 1024 }); //2kb
 
-  wss.on('connection', (ws: WebSocket & ConnectedSocket, req) => {
-    ws.ip = req.socket.remoteAddress!.toString()
+  wss.on('connection', (ws: WebSocket & ConnectedSocket) => {
+    if (!ws.protocol || ws.protocol.length < 100) return ws.close()
 
-    if (isDev()) {
-      ws.ip += getRandomArbitrary(0, 100)
-    }
+    getAuth().verifyIdToken(ws.protocol).then((decodedToken) => {
+      ws.ip = decodedToken.uid
+      ws.on('message', (data) => {
+        const [key, ...value] = data.toString().split('/')
+        const message = Events[key];
 
-    ws.on('message', (data) => {
-      const [key, ...value] = data.toString().split('/')
-      const message = Events[key];
+        if (message) {
+          message(ws, value);
+        }
+        //else if (data.toString() !== 'V1.2') {
+        //  ws.send('mismatch');
+        //  ws.close();
+        //}
 
-      if (message) {
-        message(ws, value);
-      }
-      //else if (data.toString() !== 'V1.2') {
-      //  ws.send('mismatch');
-      //  ws.close();
-      //}
-
-    });
+      });
+    }).catch(() => {
+      ws.close();
+    })
 
   });
 

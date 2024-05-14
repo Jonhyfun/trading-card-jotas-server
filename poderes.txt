@@ -29,6 +29,7 @@
 	| =  Copia a carta do oponente [2]
 	
 	< = puxa a operação mais próxima para antes dessa carta [2]
+	
 
 	
 
@@ -43,3 +44,7 @@ Comentarios =
 marc = cores
 
 rene = historico de pontos
+
+
+ignorar o fantasma no til
+ | ta ignorando na primeira carta

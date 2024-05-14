@@ -1,5 +1,6 @@
 import * as routes from './routes';
 import * as CardsObject from './cards'; //TODO watch the folder to update in real time?
+import admin from 'firebase-admin'
 import { InitializeExpress } from './initializers/express';
 import { ConnectedSocket, InitializeWebSocket, UserData } from './initializers/webSocket';
 import { Cards } from './cards/types';
@@ -16,6 +17,14 @@ let rooms: RoomType = {};
 export const deleteRoom = (room: string) => { delete rooms[room] }
 export const setRooms = (setter: ((current: RoomType) => RoomType)) => { rooms = setter(rooms) }
 export const getRooms = () => rooms;
+
+
+const serviceAccount = require("../serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: "https://biggiscript.firebaseio.com"
+});
 
 (async () => {
   const express = InitializeExpress();

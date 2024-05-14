@@ -8,8 +8,6 @@ const cardData: CardData = {
   limit: 2,
   desc: 'Essa carta se transforma na carta que o seu oponente jogou.',
   effect: (cardOwner: UserData, otherPlayer: UserData) => {
-    if (cardOwner.cardStack.length <= 1) return
-
     cardOwner.cardStack.splice(-1)
     cardOwner.cardStack.push(otherPlayer.cardStack.slice(-1)[0])
 

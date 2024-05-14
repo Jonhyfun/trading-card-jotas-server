@@ -1,7 +1,6 @@
 import { UserData } from "../../initializers/webSocket"
 import { CardData } from "../types"
 
-//TODO nao ta funcionando
 const cardData: CardData = {
   label: '~',
   value: null,
