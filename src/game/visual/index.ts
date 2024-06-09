@@ -8,7 +8,10 @@ export const handleVisualEffects = (user: UserData, stack: CardData[]) => {
       const nextCard = stack[i + 1]
 
       if ((nextCard && nextCard.operation) || !previousCard || (previousCard && previousCard.operation === '.')) {
-        user.cardVisualEffects[i] = 'overwritten'
+        deckCard.visualEffects?.push('overwritten')
+      }
+      else {
+        deckCard.visualEffects = deckCard.visualEffects?.filter((effect) => effect !== 'overwritten')
       }
     }
   })

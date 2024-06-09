@@ -46,7 +46,7 @@ admin.initializeApp({
   console.log();
   console.log('-----------------')
   console.log('\x1b[33m%s\x1b[0m', 'Available Routes:')
-  express._router.stack.forEach((r) => {
+  express._router.stack.forEach((r: any) => {
     if (r.route && r.route.path) {
       console.log('\x1b[32m%s\x1b[0m', Object.keys(r.route.methods).join(' ').toUpperCase(), r.route.path)
     }
@@ -59,20 +59,20 @@ admin.initializeApp({
 
   if (isDev()) {
     //([
-    'tilde',
-      'slash',
-      'slash',
-      'slash',
-      'exclamation',
-      'slash',
-      'ten',
-      'x',
-      'ten',
-      'exclamation',
-      'tilde',
-      'tilde',
-      'ten',
-      'slash'
+    //  'tilde',
+    //  'slash',
+    //  'slash',
+    //  'slash',
+    //  'exclamation',
+    //  'slash',
+    //  'ten',
+    //  'x',
+    //  'ten',
+    //  'exclamation',
+    //  'tilde',
+    //  'tilde',
+    //  'ten',
+    //  'slash'
     //] as Cards[]).forEach((card, i) => {
     //  tmpUser.cardStack!.push({ cardKey: card, id: `card-${i}` })
     //

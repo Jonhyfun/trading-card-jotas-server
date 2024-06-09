@@ -7,7 +7,7 @@ const math = create(all)
 const originalDivide = math.divide;
 
 math.import({
-  divide: function (a, b) {
+  divide: function (a: any, b: any) {
     if (math.isZero(a)) {
       return originalDivide(1, b)
     }
@@ -25,10 +25,10 @@ export const handlePointsSum = (user: UserData, stackAsCards: CardData[]) => {
     const nextDeckCard = stackAsCards?.[i + 1];
 
     if (nextDeckCard?.modifyPreviousCard) {
-      if (deckCard.ghost) {
+      if (deckCard.visualEffects?.includes('ghost')) {
         let notGhostIndex = -1;
         for (let i = stackAsCards.length - 1; i >= 0; i--) {
-          if (!stackAsCards[i].ghost) {
+          if (!stackAsCards[i].visualEffects?.includes('ghost')) {
             notGhostIndex = i
           }
         }

@@ -1,4 +1,4 @@
-export const removeTrailingOperations = (operation: string) => {
+export const removeTrailingOperations = (operation: string): string => {
   if (!operation || operation.length === 1) return operation
   if (!operation[0].match(/[\d-]/g)) {
     return removeTrailingOperations(operation.slice(1))

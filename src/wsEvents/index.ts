@@ -1,6 +1,6 @@
 import { setRooms } from "..";
 import { Cards, DeckCard } from "../cards/types";
-import { onUserSetCard } from "../game";
+import { handleDataSync, onUserSetCard } from "../game";
 import { ConnectedSocket } from "../initializers/webSocket";
 import { initialUserData as shallowInitialUserData } from "../utils/mock";
 import { deepCopy } from "../utils/object";
@@ -14,7 +14,7 @@ const baseSetCurrentDeck = (ws: ConnectedSocket, payload: string) => {
       selectedCards.forEach((cardKey, i) => {
         ws.deck.push(({ cardKey, id: `${i}-${makeId(8)}` }))
       })
-      console.log(`${ws.ip} salvou o deck`)
+      //console.log(`${ws.ip} salvou o deck`)
       return true
     }
   }
@@ -29,7 +29,7 @@ export const setCurrentDeckWithMessage = (ws: ConnectedSocket, payload: string) 
   }
 }
 
-const removeUserFromRoom = (ws: ConnectedSocket, room: string) => {
+const removeUserFromRoom = (ws: ConnectedSocket, room: string) => { //TODO nao deletar tudo kkkk, coloca um "left: true"
   setRooms((current) => {
     const roomWithoutLeavingUser = current[room]?.filter((user) => user.ip !== ws.ip)
     if (!roomWithoutLeavingUser) return current
@@ -43,29 +43,18 @@ const removeUserFromRoom = (ws: ConnectedSocket, room: string) => {
   })
 }
 
-export const leaveRoom = removeUserFromRoom
+export const leaveRoom = () => {/*removeUserFromRoom*/ }
 
 export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   const joinData = JSON.parse(payload) as { room: string, deck?: string[] }
   if (!joinData?.room) return
 
-  if (joinData.deck) {
-    baseSetCurrentDeck(ws, JSON.stringify(joinData.deck))
-  }
-
-  const initialUserData = deepCopy(shallowInitialUserData)
-  initialUserData.room = joinData.room
-
-  //? (o tipo) WebSocket não suporta spread (e tem muita coisa dentro que poderia cagar a performance)
-  Object.entries(initialUserData).forEach(([key, value]) => {
-    ws[key] = value;
-  })
-
-  ws.room = joinData.room
+  const initialUserData = deepCopy(shallowInitialUserData);
+  (initialUserData as any).room = joinData.room
 
   const onUserJoinRoom = () => {
     ws.onclose = () => {
-      removeUserFromRoom(ws, joinData.room)
+      //removeUserFromRoom(ws, joinData.room)
     }
     ws.send(`setStance/${ws.stance}`);
     ws.send('joinedRoom')
@@ -74,16 +63,23 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
   setRooms((current) => {
     const alreadyConnectedUserIndex = current[joinData.room] ? current[joinData.room].findIndex(({ ip }) => ip === ws.ip) : -1
 
-    if (alreadyConnectedUserIndex !== -1 && alreadyConnectedUserIndex !== undefined) {
+    if (alreadyConnectedUserIndex !== -1 && alreadyConnectedUserIndex !== undefined && current[joinData.room].length === 2) {
       const removedUser = current[joinData.room].splice(alreadyConnectedUserIndex, 1)[0]
+      const otherUser = current[joinData.room][0]
 
       Object.keys(initialUserData).forEach((key) => {
-        ws[key] = removedUser[key]
+        (ws as any)[key] = (removedUser as any)[key]
       })
 
-
-      onUserJoinRoom()
+      console.log(ws.cardStack, otherUser.cardStack)
+      handleDataSync(ws, otherUser)
+      ws.send('setGameState/running')
       console.log(`${ws.ip} reconectou em ${joinData.room} como ${ws.stance}`)
+
+      if (ws.currentSetCard && !otherUser.currentSetCard) {
+        ws.hand.push(ws.currentSetCard)
+        ws.currentSetCard = undefined;
+      }
 
       return { ...current, [joinData.room]: [...current[joinData.room], ws] }
     }
@@ -100,7 +96,18 @@ export const joinRoom = (ws: ConnectedSocket, payload: string) => {
       return current
     }
 
+    if (joinData.deck) {
+      baseSetCurrentDeck(ws, JSON.stringify(joinData.deck))
+    }
+
+    //? (o tipo) WebSocket não suporta spread (e tem muita coisa dentro que poderia cagar a performance)
+    Object.entries(initialUserData).forEach(([key, value]) => {
+      (ws as any)[key] = value;
+    })
+
     if (current[joinData.room]?.[0]) {
+      if (current[joinData.room]?.[0].ip === ws.ip) return current
+
       onUserJoinRoom()
       console.log(`${ws.ip} entrou em ${joinData.room} como ${ws.stance}`)
 

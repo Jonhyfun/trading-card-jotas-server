@@ -16,7 +16,6 @@ export interface UserData {
   deck: DeckCard[]
   points: (number | null)[]
   cardStack: DeckCard[]
-  cardVisualEffects: ('overwritten' | 'copied' | 'ghost')[]
   hiddenCards: DeckCard['id'][]
   currentSetCard?: DeckCard
   globalEffects: ('invertedOdds' | 'sendRepeatedTurn')[]
@@ -30,7 +29,7 @@ export type ConnectedSocket = WebSocket & UserData & {
 }
 
 export function InitializeWebSocket(app: Express) {
-  const server = (isDev() ? http : https).createServer({
+  const server = ((isDev() ? http : https).createServer as any)({
     key: readFileSync("privkey.pem"),
     cert: readFileSync("fullchain.pem")
   }, app);
@@ -44,10 +43,10 @@ export function InitializeWebSocket(app: Express) {
       ws.ip = decodedToken.uid
       ws.on('message', (data) => {
         const [key, ...value] = data.toString().split('/')
-        const message = Events[key];
+        const message = (Events as any)[key] as unknown as ((ws: ConnectedSocket, payload: string) => void);
 
         if (message) {
-          message(ws, value);
+          message(ws, value.join(""));
         }
         //else if (data.toString() !== 'V1.2') {
         //  ws.send('mismatch');

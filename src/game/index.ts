@@ -1,11 +1,34 @@
 import * as CardsObject from '../cards'
-import { ConnectedSocket } from "../initializers/webSocket";
+import { ConnectedSocket, UserData } from "../initializers/webSocket";
 import { DeckCard } from '../cards/types';
-import { deleteRoom, getRooms } from '..';
+import { deleteRoom } from '..';
 import { handlePointsSum } from './points';
 import { handleVisualEffects } from './visual';
 import { initialUserData } from '../utils/mock';
 import { deepCopy } from '../utils/object';
+import { getOtherRoomPlayers } from './utils';
+
+type SyncData = Pick<UserData, 'cardStack' | 'stance' | 'hand'> & { points: string }
+
+export const handleDataSync = (player: ConnectedSocket, otherPlayer: ConnectedSocket) => {
+  [
+    { syncData: [player, player], syncOtherPlayerData: [player, otherPlayer] },
+    { syncData: [otherPlayer, otherPlayer], syncOtherPlayerData: [otherPlayer, player] }
+  ].forEach((entry) => {
+    Object.entries(entry).forEach(([command, [socket, syncData]]) => {
+      if (!syncData || !socket) return
+      const { cardStack, hand, points, stance } = syncData
+      const data = {
+        cardStack,
+        hand,
+        points: (points.slice(-1)?.[0] ?? 0).toString(),
+        stance
+      } as SyncData
+
+      socket.send(`${command}/${JSON.stringify(data)}`)
+    })
+  })
+}
 
 const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSocket) => {
   const firstPendingEffect = attackingPlayer.pendingEffects.shift();
@@ -48,27 +71,11 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
       player.hand.push(nextCard)
     }
 
-    player.send(`setStance/${player.stance}`)
-    player.send(`loadHand/${JSON.stringify(player.hand)}`)
-    player.send(`loadMyStack/${JSON.stringify(player.cardStack)}`) //TODO juntar todos esses 6 sends?
-    player.send(`loadMyPoints/${(player.points.slice(-1)[0] ?? 0).toFixed(2)}`) //TODO nao era pra ter esse Nullable 0
-
   })
 
   handleVisualEffects(attackingPlayer, attackingPlayerStack)
   handleVisualEffects(defendingPlayer, defendingPlayerStack)
-
-  attackingPlayer.send(`loadOtherStack/${JSON.stringify(defendingPlayer.cardStack)}`) //TODO dry?
-  defendingPlayer.send(`loadOtherStack/${JSON.stringify(attackingPlayer.cardStack)}`)
-
-  attackingPlayer.send(`loadVisualEffects/${JSON.stringify(attackingPlayer.cardVisualEffects)}`)
-  defendingPlayer.send(`loadVisualEffects/${JSON.stringify(defendingPlayer.cardVisualEffects)}`)
-
-  attackingPlayer.send(`loadOtherVisualEffects/${JSON.stringify(defendingPlayer.cardVisualEffects)}`)
-  defendingPlayer.send(`loadOtherVisualEffects/${JSON.stringify(attackingPlayer.cardVisualEffects)}`)
-
-  attackingPlayer.send(`loadOtherPoints/${(defendingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`)
-  defendingPlayer.send(`loadOtherPoints/${(attackingPlayer.points.slice(-1)[0] ?? 0).toFixed(2)}`)
+  handleDataSync(attackingPlayer, defendingPlayer)
 
   if (attackingPlayer.hand.length === 0 || defendingPlayer.hand.length === 0) {
     const attackWins = (attackingPlayer.points.slice(-1)?.[0] ?? 0) > (defendingPlayer.points.slice(-1)?.[0] ?? 0);
@@ -79,7 +86,7 @@ const onReveal = (attackingPlayer: ConnectedSocket, defendingPlayer: ConnectedSo
 
     [attackingPlayer, defendingPlayer].forEach((player) => {
       Object.entries(deepCopy(initialUserData)).forEach(([key, value]) => {
-        player[key] = value;
+        (player as any)[key] = value;
       })
       player.room = null
     })
@@ -92,12 +99,13 @@ export const onUserSetCard = (player: ConnectedSocket, card: DeckCard) => {
   if (!player.currentSetCard) {
     player.currentSetCard = card
 
-    const roomPlayers = getRooms()[player.room!]
-    const otherPlayer = roomPlayers.find(({ ip }) => ip !== player.ip)
+    const otherPlayer = getOtherRoomPlayers(player)[0]
 
     if (!otherPlayer) return player.send('error/Sala vazia!')
 
-    if (roomPlayers.every((player) => player.currentSetCard)) {
+    player.send('setStance/pending')
+
+    if ([player, otherPlayer].every((player) => player.currentSetCard)) {
       const focusedStack = player.stance === 'attack' ? otherPlayer.cardStack : player.cardStack
       const otherStack = player.stance === 'defense' ? otherPlayer.cardStack : player.cardStack
 
