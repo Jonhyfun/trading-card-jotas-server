@@ -15,8 +15,7 @@ export function InitializeExpress() {
     res.send('x7azHRAgMEpyyHHIUgj21_0-0NUcqxKOywy-RAvsyAQ.JdBjlVg4ZbelazlWDsncgBeQtHeDOGkT6JO6-bwjWYs').end()
   });
 
-
-  ((isDev() ? http : https).createServer as any)({
+  (isDev() ? http : https).createServer({
     key: readFileSync("privkey.pem"),
     cert: readFileSync("fullchain.pem")
   }, app).listen(86);

@@ -1,4 +1,4 @@
-export function getRandomArbitrary(min: number, max: number) {
+export function getRandomArbitrary(min, max) {
   return Math.round(Math.random() * (max - min) + min);
 }
 

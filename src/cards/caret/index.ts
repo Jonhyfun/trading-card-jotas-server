@@ -4,7 +4,7 @@ import { CardData } from "../types"
 
 const cardData: CardData = {
   label: '^',
-  visualEffects: ['ghost'],
+  ghost: true,
   value: null,
   limit: 1,
   desc: 'Mova a carta anterior para trás.',
@@ -13,7 +13,7 @@ const cardData: CardData = {
 
     let lastNonGhostIndex = -1;
     for (let i = cardOwner.cardStack.length - 1; i >= 0; i--) {
-      if (!CardsObject[cardOwner.cardStack[i].cardKey].default.visualEffects?.includes('ghost')) {
+      if (!CardsObject[cardOwner.cardStack[i].cardKey].default.ghost) {
         lastNonGhostIndex = i;
         break;
       }

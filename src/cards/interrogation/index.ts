@@ -13,7 +13,7 @@ const cardData: CardData = {
     cardOwner.cardStack.splice(-1)
     cardOwner.cardStack.push(cardOwner.cardStack[Math.floor(Math.random() * cardOwner.cardStack.length)])
 
-    cardOwner.cardStack[cardOwner.cardStack.length - 1].visualEffects?.push('copied')
+    cardOwner.cardVisualEffects[cardOwner.cardStack.length - 1] = 'copied'
 
     const copiedCard = CardsObject[cardOwner.cardStack.slice(-1)[0].cardKey].default
     if (copiedCard.label !== cardData.label) {

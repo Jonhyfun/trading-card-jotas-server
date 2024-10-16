@@ -6,7 +6,7 @@ const cardData: CardData = {
   label: '<',
   value: null,
   limit: 2,
-  visualEffects: ['ghost'],
+  ghost: true,
   desc: 'Puxa a operação mais próxima para antes dessa carta.',
   effect: (cardOwner: UserData, otherPlayer: UserData) => {
     if (cardOwner.cardStack.length === 1) return;

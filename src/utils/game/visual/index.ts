@@ -1,5 +1,5 @@
-import { CardData } from "../../cards/types"
-import { UserData } from "../../initializers/webSocket"
+import { CardData } from "../../../cards/types"
+import { UserData } from "../../../initializers/webSocket"
 
 export const handleVisualEffects = (user: UserData, stack: CardData[]) => {
   stack.forEach((deckCard, i) => {
