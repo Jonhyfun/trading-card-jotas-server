@@ -1,0 +1,50 @@
+	1 = 1 ponto [3]
+	2 = 2 pontos [3]
+	3 = 3 pontos [3]
+	5 = 5 pontos [3]
+	10 = 10 pontos [1]
+
+	-3 = -3 pontos [3]
+	-4 = -4 pontos [3]
+
+
+	! = Troca a carta anterior com a carta da pilha inimiga [2]
+- = Inverte o sinal dos números ímpares [2]
+? = A próxima carta pode ser colocada virada para baixo, para ser revelada apenas 	ao final do jogo (fantasma) 	[2]
+	? = Essa carta toma a forma de uma carta aleatória pertencente a pilha colocada [2]
++ = Copia a próxima carta [2]
+	x = Multiplica o número/produto anterior com a próxima carta [2]
+	
+	/ = Divide o número/produto anterior com a próxima carta [2]
+
+	-- 0 = Substitua uma carta por 0 (a carta vem para sua mão) [1] BROKEN?
+
+	^ (0) = Mova a carta anterior para trás (fantasma) [1]
+	# (-3) = No próximo turno você e seu oponente continuam na mesma pilha (fantasma) [1]
+	& (2) = Essa carta volta 3 casas e vale 2 [1]
+	
+	~ = inverte o sinal da carta anterior [2]
+
+	* = Copia a carta anterior [2]
+	| =  Copia a carta do oponente [2]
+	
+	< = puxa a operação mais próxima para antes dessa carta [2]
+	
+
+	
+
+
+	fantasma - A carta é pulada em efeitos que consideram "a próxima carta" (caso a carta tenha valor, o valor só é aplicado diretamente ao total.
+
+
+Comentarios = 
+--joelho = Clona uma carta aleatoria das duas pilhas (ou da pilha jogada)
+--forna = Inverte o sinal do total atual
+--eu = carta que embaralha a pilha aleatoriamente? kkkkk
+marc = cores
+
+rene = historico de pontos
+
+
+ignorar o fantasma no til
+ | ta ignorando na primeira carta

@@ -1,0 +1,18 @@
+model User {
+  firebaseId String @id @unique
+  email      String @unique
+  Deck       Deck?
+}
+
+model Deck {
+  id             String @id @default(uuid()) @db.Uuid //? id of specific card the user is holding
+  cards          Card[]
+  User           User   @relation(fields: [userFirebaseId], references: [firebaseId])
+  userFirebaseId String @unique
+}
+
+model Card {
+  id     String  @id @db.Uuid
+  Deck   Deck?   @relation(fields: [deckId], references: [id])
+  deckId String? @db.Uuid
+}
