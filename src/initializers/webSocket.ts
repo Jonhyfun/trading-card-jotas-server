@@ -31,10 +31,11 @@ export type ConnectedSocket = WebSocket &
   };
 
 export function InitializeWebSocket(app: Express) {
-  const server = (isDev() ? http : https).createServer(
+  const devMode = isDev()
+  const server = (devMode ? http : https).createServer(
     {
-      key: readFileSync("privkey.pem"),
-      cert: readFileSync("fullchain.pem"),
+      key: devMode ? undefined : readFileSync("privkey.pem"),
+      cert: devMode ? undefined : readFileSync("fullchain.pem"),
     },
     app
   );
